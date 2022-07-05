@@ -1,10 +1,16 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart' as d;
 import 'package:html/parser.dart' as parser;
 import 'package:nsutz/model/attendance_model.dart';
 import 'package:nsutz/model/custom_response.dart';
+import 'package:nsutz/model/notice_model.dart';
 import 'package:nsutz/model/student_model.dart';
+import 'package:intl/intl.dart';
+import 'package:nsutz/services/session_service.dart';
 
 class NsutApi {
   var dio = Dio();
@@ -46,6 +52,7 @@ class NsutApi {
     } on DioError catch (e) {
       if (e.response?.statusCode == 302) {
         var cookie = e.response?.headers.map["set-cookie"]?[0].split(";")[0];
+        debugPrint(e.response!.data!.toString());
         dio.options.headers["Cookie"] = cookie;
         return CustomResponse(data: cookie);
       } else {
@@ -66,6 +73,32 @@ class NsutApi {
       var document = parser.parse(resStr.data);
       Map<String, String> ret = {};
       ret["hrand"] = document.getElementById("HRAND_NUM")!.attributes["value"]!;
+      String? imgCaptcha =
+          document.getElementById("captchaimg")?.attributes["src"];
+      if (imgCaptcha != null) {
+        ret["captcha"] = "https://imsnsit.org/imsnsit/" + imgCaptcha;
+      }
+      return CustomResponse(data: ret);
+    } on DioError catch (e) {
+      debugPrint("Network Error" + e.response!.statusCode.toString());
+      return CustomResponse(error: "Network Error");
+      // if (e.response?.statusCode == 302) {}
+    }
+  }
+
+  Future<CustomResponse<Map<String, String>>>
+      reloadCaptcha() async //TODO:implement this
+  {
+    try {
+      dio.options.headers.addAll({
+        "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
+      });
+
+      var resStr =
+          await dio.get("/imsnsit/plum5_fw_utils.php?rty=captcha&typ=login");
+      var document = parser.parse(resStr.data);
+      Map<String, String> ret = {};
+      // ret["hrand"] = //hrand will be same
       String? imgCaptcha =
           document.getElementById("captchaimg")?.attributes["src"];
       if (imgCaptcha != null) {
@@ -102,10 +135,14 @@ class NsutApi {
         "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
       });
 
-      await dio.post("/imsnsit/student_login.php", data: data);
+      var res = await dio.post("/imsnsit/student_login.php", data: data);
     } on DioError catch (e) {
       if (e.response?.statusCode == 302) {
         if (e.response?.headers.map["Location"]?[0] != null &&
+            e.response?.headers.map["Location"]?[0] == "student_login.php") {
+          log("reload the session"); //TODO: improve this if else and reload the session
+          return CustomResponse(error: "wrong user details");
+        } else if (e.response?.headers.map["Location"]?[0] != null &&
             e.response?.headers.map["Location"]?[0] !=
                 "student_login.php?uid=") //login success
         {
@@ -114,12 +151,13 @@ class NsutApi {
 
           return await getStudentImsUrls(plumUrl);
         } else {
-          return CustomResponse(error: "wrong captcha/user details");
+          return CustomResponse(error: "wrong captcha");
         }
       } else {
         return CustomResponse(error: "Network Error");
       }
     }
+
     return CustomResponse(error: "Network Error");
   }
 
@@ -130,6 +168,9 @@ class NsutApi {
       var res = await dio.get(
         plumUrl,
       );
+      if (res.data.toString().contains("Session")) {
+        return CustomResponse(error: 'Session Expired,Relogin');
+      }
       Map<String, String> ret = {}; //return var
       var document = parser.parse(res.data).getElementsByClassName("tm-bg");
       ret["plumUrl"] = plumUrl;
@@ -152,6 +193,7 @@ class NsutApi {
       var res = await dio.get(dashboardUrl);
       var document = parser.parse(res.data);
       var allElements = document.querySelectorAll("tr.plum_fieldbig");
+
       Student studentData = Student();
 
       studentData.studentImage = CachedNetworkImage(
@@ -213,6 +255,15 @@ class NsutApi {
       }
       var activityDoc = parser.parse(activity.data);
 
+      //testing
+      // SessionSerivce _sessionService = d.Get.find<SessionSerivce>();
+      // print(activityDoc.querySelectorAll("li")[8].querySelector("a")!.text);
+      // var ttLink = activityDoc
+      // .querySelectorAll("li")[10]
+      // .querySelector("a")!
+      // .attributes["href"];
+
+      // await getAllTT(_sessionService.sessionData.plumUrl!, ttLink!);
       String semRegisteredLink = activityDoc
           .querySelectorAll("li")[15]
           .querySelector("a")!
@@ -233,7 +284,7 @@ class NsutApi {
           .attributes["href"]!;
       var data = {
         "year": year,
-        "sem": 3, //semesterNo
+        "sem": semesterNo, //semesterNo
         "submit": "Submit",
         "recentitycode": rollNo,
         "degree": degree,
@@ -256,14 +307,43 @@ class NsutApi {
       var trPlumhead = attendanceDoc.querySelectorAll("tr.plum_head");
       //subject codes element
       var subjectElement = trPlumhead[2];
+      if (subjectElement.children.length == 2) {
+        // return CustomResponse(error: "No attendance to fetch");
+        return CustomResponse(
+            data: {"attnData": <AttendanceModel>[], "semNo": semesterNo});
+      }
+
       //table overall elements
       var overallPercentage = trPlumhead[trPlumhead.length - 1];
       var overallPresent = trPlumhead[trPlumhead.length - 2];
       var overallAbsent = trPlumhead[trPlumhead.length - 3];
       var overallClasses = trPlumhead[trPlumhead.length - 4];
 
-      //subeject code names and attendance marked equvalents
-      var legends = attendanceDoc.querySelector("tr.plum_fieldbig");
+      //legends
+      var legends = attendanceDoc
+          .querySelector("tr.plum_fieldbig")!
+          .querySelectorAll('b');
+      // log(attendance.data.toString()); //USE LOG TO PRINT BIG STATEMENT
+
+      //subject codes and name
+      List<String> subCodeEquvalent = legends[0].innerHtml.split("<br>");
+      // legends
+      //[1].innerHtml.split("<br>");
+
+      //TODO:match the equivalent with data and replace it using a temporary map<String,String>
+      Map<String, String> attnMarkEquivalent = {
+        "CR": "Class Rescheduled",
+        "CS": "Class Suspended",
+        "GH": "Gazetted Holiday",
+        "MB": "Mass Bunk",
+        "MS": "Mid Sem Exam",
+        "NA": "Timetable Not Allotted",
+        "NT": "Class Not Taken",
+        "OD": "Teacher on Official duty",
+        "TL": "Teacher on Leave",
+        "1+1": "2",
+        "1": "1"
+      }; //HardCoded
 
       //tabe tr elements
       var tr = attendanceDoc.querySelectorAll("tr:not(.plum_head)");
@@ -273,6 +353,7 @@ class NsutApi {
 
         attendanceData.add(AttendanceModel(
             details: [],
+            subjectName: subCodeEquvalent[i - 1].split("-")[1],
             subjectCode: subjectElement.children[i].text,
             overallPresent: overallPresent.children[i].text,
             overallPercentage:
@@ -281,14 +362,20 @@ class NsutApi {
             overallClasses: overallClasses.children[i].text));
       }
 
-      for (var i = tr.length - 1; i > 0; i--) {
-        if (tr[i].children.length == subjectElement.children.length) {
-          var td = tr[i].children;
+      //TODO:Tp sort the date issue : dec 2021 to jan 2022 ,see my 2020 ims profile attn of sem 1 at 2020-21
+      int todaysDate = getTodaysDecryptedDate();
+      for (var i = tr.length - 1; i >= 0; i--) {
+        if (tr[i].children.length == subjectElement.children.length &&
+            getdecryptedDate(tr[i].children[0].text) <=
+                todaysDate) //only see that row which has attn data not the heading or etc
+        {
+          var td = tr[i].children; //get date and attn data row individually
           for (var i = 1;
               i < td.length;
               i++) //no of subjects wise loop -> 0th index will be date
           {
-            attendanceData[i - 1].details!.add({td[0].text: td[i].text});
+            String fullLegend = attnMarkEquivalent[td[i].text] ?? td[i].text;
+            attendanceData[i - 1].details!.add({td[0].text: fullLegend});
           }
         }
       }
@@ -301,6 +388,146 @@ class NsutApi {
     }
   }
 
+  //TODO:UNDERDEVELOPMENT
+  Future<void> getAllTT(String plumUrl, String ttUrl) async {
+    List<List<Subject>> TT = [];
+    TT.add((await getTimetable(plumUrl, ttUrl, "Mon"))!);
+    TT.add((await getTimetable(plumUrl, ttUrl, "Tue"))!);
+    TT.add((await getTimetable(plumUrl, ttUrl, "Wed"))!);
+    TT.add((await getTimetable(plumUrl, ttUrl, "Thu"))!);
+    TT.add((await getTimetable(plumUrl, ttUrl, "Fri"))!);
+
+    // print(TT[0][1].teachers.toString());
+  }
+
+  Future<List<Subject>?> getTimetable(
+    String plumUrl,
+    String ttUrl,
+    String day,
+  ) async {
+    var data = {
+      "sem": "2",
+      "sec": "2",
+      "degree": "B.Tech.",
+      "subdepartment": "INFORMATION TECHNOLOGY",
+      "spec": "INFORMATION TECHNOLOGY",
+      "wkd": day,
+      "submit": "Go"
+    };
+    try {
+      dio.options.headers.addAll({
+        "Referer": plumUrl,
+      });
+      List<Subject> subTT = [];
+      Response ttRes = await dio.post(ttUrl, data: data);
+      var activityDoc = parser.parse(ttRes.data);
+      var table = activityDoc
+          .querySelectorAll("table.plum_fieldbig")[1]
+          .getElementsByTagName("tr");
+      for (var tr in table) {
+        late Subject temp = Subject(teachers: []);
+        for (var td in tr.children) {
+          var substr1 = td.text.split(" - ");
+
+          temp = Subject(subCode: substr1[0], teachers: []);
+          var substr2 = substr1[1].split(" / ");
+          // print(substr2.toString());
+          Map<String, String> data = {};
+
+          data.addAll({substr2[0]: substr2[1]});
+          temp.teachers.add(data);
+        }
+        subTT.add(temp);
+        return subTT;
+      }
+    } on DioError catch (e) {
+      debugPrint(e.message);
+    }
+    return null;
+  }
+
+  //NOTICES
+  Future<CustomResponse<List<NoticeModel>>> getNotices() async {
+    try {
+      dio.options.headers.addAll({
+        "Referer": "https://www.imsnsit.org/imsnsit/",
+      });
+      List<NoticeModel> noticesLink = [];
+      Response noticeRes =
+          await dio.get("https://www.imsnsit.org/imsnsit/notifications.php");
+      var activityDoc = parser.parse(noticeRes.data);
+      var tableRows = activityDoc.querySelectorAll("tr");
+
+      for (int i = 4; i < tableRows.length; i++) {
+        var row = tableRows[i];
+        var rowChildren = row.querySelectorAll("td");
+        if (rowChildren.length == 2) {
+          if (rowChildren[1].querySelector('a') == null) {
+            noticesLink.add(NoticeModel(
+                notice: rowChildren[1].children[0].text,
+                publishedBy: rowChildren[1].children[2].text,
+                date: rowChildren[0].text));
+          } else {
+            noticesLink.add(NoticeModel(
+              date: rowChildren[0].text,
+              notice: rowChildren[1].children[0].text,
+              url: rowChildren[1].children[0].attributes["href"]!,
+              publishedBy: rowChildren[1].children[2].text,
+            ));
+          }
+        }
+      }
+      return CustomResponse(data: noticesLink);
+    } on DioError catch (e) {
+      debugPrint(e.message);
+      return CustomResponse(error: "Network error");
+    }
+  }
+
+  Future<CustomResponse<List<NoticeModel>>> getOldNotices() async {
+    try {
+      dio.options.headers.addAll({
+        "Referer": "https://www.imsnsit.org/imsnsit/",
+      });
+      List<NoticeModel> noticesLink = [];
+      var data = {
+        "branch": "All",
+        "olddata": "Archive: Click to View Old Notices / Circulars"
+      };
+      Response noticeRes = await dio.post(
+          "https://www.imsnsit.org/imsnsit/notifications.php",
+          data: data);
+      var activityDoc = parser.parse(noticeRes.data);
+      var tableRows = activityDoc.querySelectorAll("tr");
+
+      for (int i = 4; i < tableRows.length; i++) {
+        var row = tableRows[i];
+        var rowChildren = row.querySelectorAll("td");
+        if (rowChildren.length == 2) {
+          if (rowChildren[1].querySelector('a') == null) {
+            var splitNotice =
+                rowChildren[1].children[0].text.split("Published By:");
+
+            noticesLink.add(NoticeModel(
+                notice: splitNotice[0],
+                publishedBy: "Published By:" + splitNotice[1],
+                date: rowChildren[0].text));
+          } else {
+            noticesLink.add(NoticeModel(
+              date: rowChildren[0].text,
+              notice: rowChildren[1].children[0].text,
+              url: rowChildren[1].children[0].attributes["href"]!,
+              publishedBy: rowChildren[1].children[2].text,
+            ));
+          }
+        }
+      }
+      return CustomResponse(data: noticesLink);
+    } on DioError catch (e) {
+      debugPrint(e.message);
+      return CustomResponse(error: "Network error");
+    }
+  }
   // Future<bool> logout(String plumUrl, String logoutUrl) async {
   //TODO: search is logout really works in php site  by using postman and first logout then try if yiu can still retrieve data from plum url or not
   // try {
@@ -326,4 +553,56 @@ class NsutApi {
 
   // }
 
+}
+
+int getdecryptedDate(String enncodedDate) {
+  var splitEncDate = enncodedDate.split("-");
+  String endcodedMonth = splitEncDate[0];
+  String day = splitEncDate[1];
+  String? month;
+
+  if (endcodedMonth == "Dec") {
+    month = "12";
+  } else if (endcodedMonth == "Nov") {
+    month = "11";
+  } else if (endcodedMonth == "Oct") {
+    month = "10";
+  } else if (endcodedMonth == "Sep") {
+    month = "09";
+  } else if (endcodedMonth == "Aug") {
+    month = "08";
+  } else if (endcodedMonth == "Jul") {
+    month = "07";
+  } else if (endcodedMonth == "Jun") {
+    month = "06";
+  } else if (endcodedMonth == "May") {
+    month = "05";
+  } else if (endcodedMonth == "Apr") {
+    month = "04";
+  } else if (endcodedMonth == "Mar") {
+    month = "03";
+  } else if (endcodedMonth == "Feb") {
+    month = "02";
+  } else if (endcodedMonth == "Jan") {
+    month = "01";
+  }
+  var date = "2022$month$day";
+  return int.parse(date);
+}
+
+int getTodaysDecryptedDate() {
+//YYMMDD - 20210504
+  NumberFormat formatter = NumberFormat("00");
+  var todaysDate = DateTime.now();
+  var stringTodaysDate =
+      "${todaysDate.year}${formatter.format(todaysDate.month)}${formatter.format(todaysDate.day)}";
+
+  return int.parse(stringTodaysDate);
+}
+
+class Subject {
+  String? subCode;
+  List<Map<String, String>> teachers;
+  //grp or tut : teacher
+  Subject({this.subCode, required this.teachers});
 }

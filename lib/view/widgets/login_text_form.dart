@@ -4,22 +4,28 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class LoginTextFormField extends StatelessWidget {
   const LoginTextFormField(
       {Key? key,
+      this.focusNode,
       required this.controller,
       required this.labelText,
-      this.validator,
+      required this.validator,
+      required this.isObscureText,
       required this.prefix,
       required this.isEnable,
       required this.keyboardType})
       : super(key: key);
   final bool isEnable;
+  final bool isObscureText;
   final TextEditingController controller;
   final String labelText;
   final String? Function(String?)? validator;
   final IconData prefix;
   final TextInputType keyboardType;
+  final FocusNode? focusNode;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      focusNode: focusNode,
+      obscureText: isObscureText,
       keyboardType: keyboardType,
       showCursor: isEnable,
       readOnly: !isEnable,

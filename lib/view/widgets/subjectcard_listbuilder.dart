@@ -9,9 +9,7 @@ class SubjectCardListBuilder extends GetView<DashboardController> {
   // final List<AttendanceModel> subjectdata;
 
   const SubjectCardListBuilder({
-    // required this.subjectdata,
     Key? key,
-    // required this.onTapCardFunction,
   }) : super(key: key);
 
   @override
@@ -25,10 +23,16 @@ class SubjectCardListBuilder extends GetView<DashboardController> {
 
         return GestureDetector(
           onTap: () => controller.openSubdayWise(
-              subjectItem.subjectCode!, subjectItem.overallPercentage!),
+              overallPer: subjectItem.overallPercentage!,
+              subCode: subjectItem.subjectCode!,
+              subName: subjectItem.subjectName!),
           child: SubjectsCard(
-              percent: subjectItem.overallPercentage!,
-              subject: subjectItem.subjectCode!),
+            percent: subjectItem.overallPercentage!,
+            subject:
+                subjectItem.subjectCode! + " : " + subjectItem.subjectName!,
+            overallClasses: int.parse(subjectItem.overallClasses!),
+            presentClasses: int.parse(subjectItem.overallPresent!),
+          ),
         );
       },
     );

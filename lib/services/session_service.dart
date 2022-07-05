@@ -1,18 +1,15 @@
 //Stores session related data and session fetching services
 
 import 'package:get/get.dart';
-import 'package:nsutz/model/credentials_model.dart';
 import 'package:nsutz/model/session_model.dart';
 import 'package:nsutz/routes/routes_const.dart';
-import 'package:nsutz/services/creditional_service.dart';
 import 'package:nsutz/services/nsutapi.dart';
 import 'package:nsutz/services/shared_pref.dart';
 
 class SessionSerivce {
-//api service
+//core service
   final NsutApi _nsutApi = Get.find<NsutApi>();
   final SharedPrefs _sharedPrefsService = Get.find<SharedPrefs>();
-  final CreditionalSerivce _creditionalSerivce = Get.find<CreditionalSerivce>();
 
 //my services
   Session sessionData = Session();
@@ -35,9 +32,15 @@ class SessionSerivce {
     return res.data!['captcha'];
   }
 
-  Future<String?> login(String rollno, String password, String captcha) async {
+  Future<String?> login(
+      {String? rollno, String? password, required String captcha}) async {
+    if (rollno == null && password == null) //captcha login
+    {
+      rollno = sessionData.rollNo;
+      password = sessionData.password;
+    }
     var res = await _nsutApi.loginAndCheckCaptcha(
-        rollno, password, captcha, sessionData.hrand!);
+        rollno!, password!, captcha, sessionData.hrand!);
     if (res.error != null || res.data == null) //retry
     {
       return res.error;
@@ -50,66 +53,78 @@ class SessionSerivce {
     sessionData.logout = res.data!["logout"]!;
     sessionData.plumUrl = res.data!["plumUrl"]!;
 
-    //saving in creds model
-    _creditionalSerivce.rollNo = rollno;
-    _creditionalSerivce.password = password;
+    sessionData.rollNo = rollno;
+    sessionData.password = password;
 
     //login success
     //save all data  locally
     _sharedPrefsService.rollNo = rollno;
     _sharedPrefsService.password = password;
-    _sharedPrefsService.isLogin = true;
     _sharedPrefsService.cookie = sessionData.cookie;
     _sharedPrefsService.plumUrl = sessionData.plumUrl;
-    // print(_sharedPrefsService.cookie);
-    // print(_sharedPrefsService.plumUrl);
+
     return null;
   }
 
   Future<bool?> resumeLogin() async {
-    var isLogin = _sharedPrefsService.isLogin;
+    /*
+    null->relogin using id and pass
+    true->resume success
+    false->relogin using captcha
+    */
     var cookie = _sharedPrefsService.cookie;
     var plumUrl = _sharedPrefsService.plumUrl;
+    var rollNo = _sharedPrefsService.rollNo;
+    var password = _sharedPrefsService.password;
     // print(isLogin);
     // print(cookie);
     // print(plumUrl);
-    if (isLogin &&
-        cookie != null &&
-        plumUrl !=
-            null) //TODO:remove isLogin and use rollNo and password as its replacement
+    if (rollNo != null && password != null) //already login
     {
-      await startSessionService(cookie: cookie); //set stored cookie
+      sessionData.rollNo = _sharedPrefsService.rollNo;
+      sessionData.password = _sharedPrefsService.password;
+      if (cookie != null && plumUrl != null) //restore login session
+      {
+        await startSessionService(cookie: cookie); //set stored cookie
 
-      var res =
-          await _nsutApi.getStudentImsUrls(plumUrl); //get the profile Ims links
+        var res = await _nsutApi
+            .getStudentImsUrls(plumUrl); //get the profile Ims links
 
-      if (res.error != null || res.data == null) {
-        //removed expired data
-        _sharedPrefsService.cookie = null;
-        _sharedPrefsService.plumUrl = null;
+        if (res.error != null ||
+            res.data == null) //session expired !relogin using new captcha
+        {
+          //removed expired data
+          _sharedPrefsService.cookie = null;
+          _sharedPrefsService.plumUrl = null;
 
-        return false; //session expired !relogin using new captcha
-      } else {
-        sessionData.plumUrl = res.data!["plumUrl"];
-        sessionData.dashboard = res.data!["dashboard"];
-        sessionData.activities = res.data!["activities"];
-        sessionData.registration = res.data!["registration"];
-        sessionData.logout = res.data!["logout"];
+          return false;
+        } else {
+          sessionData.plumUrl = res.data!["plumUrl"];
+          sessionData.dashboard = res.data!["dashboard"];
+          sessionData.activities = res.data!["activities"];
+          sessionData.registration = res.data!["registration"];
+          sessionData.logout = res.data!["logout"];
+          return true; //login successfull
+        }
+      } else //no prev session,start a new one with saved roll no and captcha
+      {
+        await startSessionService();
+        return false;
       }
-      return true; //login successfull
-    } else {
-      return null; //no prev data !login
     }
+    //else no prev data login -> relogin
+    await startSessionService();
+    return null;
   }
 
   void logOut() async {
     // var res = await _nsutApi.logout(sessionData.plumUrl!, sessionData.logout!);
-    // _creditionalSerivce.credentialsData = Credentials();
-    // _sharedPrefsService.cookie = null;
-    // _sharedPrefsService.isLogin = false;
-    // _sharedPrefsService.password = null;
-    // _sharedPrefsService.plumUrl = null;
+    resetSessionData();
+    _sharedPrefsService.resetLocalStorage();
+    Get.offAllNamed(Routes.SPLASH);
+  }
 
-    Get.offAllNamed(Routes.LOGIN);
+  void resetSessionData() {
+    sessionData = Session();
   }
 }

@@ -8,11 +8,15 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 class SubjectsCard extends StatelessWidget {
   const SubjectsCard({
     Key? key,
+    required this.overallClasses,
+    required this.presentClasses,
     required this.percent,
     required this.subject,
   }) : super(key: key);
   final double percent;
   final String subject;
+  final int overallClasses;
+  final int presentClasses;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +24,7 @@ class SubjectsCard extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 15.w),
       color: kCardbackgroundcolor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25.0),
+        borderRadius: BorderRadius.circular(55.w),
       ),
       elevation: 6.0,
       child: Tooltip(
@@ -79,7 +83,7 @@ class SubjectsCard extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  getMsg(percent),
+                  getMsg(percent, overallClasses, presentClasses),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Questrial',
@@ -95,6 +99,8 @@ class SubjectsCard extends StatelessWidget {
   }
 
   Color getcolor(double percent) {
+    if (percent == 0) return kLightgreen; //no lecture conducted
+
     if (percent >= 75.0)
       return kLightgreen;
     else if (percent >= 55.0)
@@ -103,12 +109,41 @@ class SubjectsCard extends StatelessWidget {
       return kLightred;
   }
 
-  String getMsg(double percent) {
-    if (percent >= 75.0)
-      return "Safe! You can take leave for x classes";
-    else if (percent >= 55.0)
-      return "Unsafe! Attend x class to enter green zone";
-    else
-      return "Too low attendance! Attend x class to enter green zone";
+  String getMsg(double percent, int overallClasses, int presentClasses) {
+    int count = 0;
+    var tempPer = percent;
+    var tempOverallClasses = overallClasses;
+    //to take leave
+    while ((tempPer > 75)) {
+      tempOverallClasses = tempOverallClasses + 1;
+      tempPer = (presentClasses / tempOverallClasses) * 100;
+      if (tempPer >= 75)
+        count++;
+      else
+        break;
+    }
+    tempPer = percent;
+    tempOverallClasses = overallClasses;
+    //to get 75
+    while ((tempPer < 75)) {
+      tempOverallClasses = tempOverallClasses + 1;
+      presentClasses = presentClasses + 1;
+      tempPer = (presentClasses / tempOverallClasses) * 100;
+      if (tempPer < 75)
+        count++;
+      else
+        break;
+    }
+
+    if (percent == 0) return "classes not started yet!";
+    if (percent >= 75.0) {
+      return "Safe! You can take leave for $count classes";
+    } else {
+      if (percent >= 55.0) {
+        return "Unsafe! Attend $count class to enter green zone";
+      } else {
+        return "Too low attendance! Attend $count class to enter green zone";
+      }
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nsutz/controller/dashboard_controller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nsutz/routes/routes_const.dart';
 import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/view/widgets/subjectcard_listbuilder.dart';
 
@@ -18,6 +19,16 @@ class DashboardView extends GetView<DashboardController> {
         elevation: 0.0,
         title: Text("Dashboard"),
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              child: Icon(
+                Icons.book,
+                size: 30.0,
+              ),
+              onTap: () => Get.toNamed(Routes.NOTICE),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 20.0),
             child: GestureDetector(
@@ -39,6 +50,7 @@ class DashboardView extends GetView<DashboardController> {
               Text(
                 'Welcome, ${controller.getGreetingName()}',
                 style: TextStyle(
+                  fontFamily: 'Questrial',
                   fontSize: 60.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -138,10 +150,22 @@ class DashboardView extends GetView<DashboardController> {
                               child: CircularProgressIndicator(
                             color: kLightgreen,
                           ));
+                        } else if (snapshot.data != null &&
+                            controller.attnData.isEmpty) {
+                          return Center(
+                            child: Text(
+                              'No attendance updated to fetch!',
+                              style: TextStyle(
+                                fontSize: 50.sp,
+                                fontFamily: 'Questrial',
+                              ),
+                            ),
+                          );
                         } else if (snapshot.hasError || snapshot.data == null) {
                           return Center(
                             child: Text(
-                              'Error! Press Refresh to load',
+                              'Error! Press Refresh to load + ${snapshot.data}' //TODO: make this more cleaner
+                              ,
                               style: TextStyle(
                                 fontSize: 50.sp,
                                 fontFamily: 'Questrial',

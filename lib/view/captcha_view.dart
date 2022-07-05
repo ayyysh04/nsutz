@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-import 'package:nsutz/controller/capthca_controller.dart';
+import 'package:nsutz/controller/captcha_controller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nsutz/view/widgets/captcha_numpad.dart';
 import 'package:nsutz/view/widgets/login_text_form.dart';
@@ -89,7 +89,7 @@ class CaptchaView extends GetView<CaptchaController> {
                           flex: 1,
                         ),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             FutureBuilder<String?>(
                                 future: controller.getCaptcha(),
@@ -110,7 +110,11 @@ class CaptchaView extends GetView<CaptchaController> {
                                     },
                                   );
                                 })),
+                            SizedBox(
+                              height: 30,
+                            ),
                             LoginTextFormField(
+                              isObscureText: false,
                               prefix: Icons.password,
                               controller: controller.captchaController,
                               labelText: 'CAPTCHA',

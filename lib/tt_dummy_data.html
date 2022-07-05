@@ -1,0 +1,352 @@
+<LINK href='css/METAL/app.css' type=text/css rel=stylesheet>
+<SCRIPT LANGUAGE='javascript' src='js/plumjs.js' type='text/javascript'> </SCRIPT>
+<LINK href='css/METAL/app.css' type=text/css rel=stylesheet>
+<SCRIPT LANGUAGE='javascript' src='js/plumjs.js' type='text/javascript'>
+</SCRIPT>
+<!DOCTYPE html>
+<!-- saved from url=(0063)file:///C:/Users/adm/Desktop/Toogle%20search/togglesearch.html? -->
+<html>
+
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=windows-1252'>
+    <link href='item-block.css' rel='stylesheet'>
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.ttable_block').hide();
+            var is_btn = false;
+            $('.ttable_btn').hover(function () {
+                is_btn = true;
+                $('.ttable_block').hide();
+                $(this).parent().find('.ttable_block').toggle();
+            });
+
+            $(body).hover(function () {
+                if (!is_btn)
+                    $('.ttable_block').hide();
+                is_btn = false;
+            });
+
+        });
+        function CheckFaculty() {
+            faculty = document.getElementById('txttutorcode').value;
+            if (faculty == '') {
+                alert('Please Pick Faculty and Proceed.');
+                return false;
+            }
+            return true;
+        }
+        function CheckRoom() {
+            room = document.getElementById('txtroomcode').value;
+            if (room == '') {
+                alert('Please Pick Room and Proceed.');
+                return false;
+            }
+            return true;
+        }
+        function PushNA(typ) {
+            if (typ == 'Dept.All') {
+                document.getElementById('txttutor').value = 'Dept.All';
+                document.getElementById('txttutorcode').value = 'Dept.All';
+            }
+            if (typ == 'All') {
+                document.getElementById('txttutor').value = 'All';
+                document.getElementById('txttutorcode').value = 'All';
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial;
+        }
+    </style>
+</head>
+
+<body>
+    <table width=99% style='margin:5px'>
+        <tr>
+            <td style='background-color:#FFAA00;' class='shadow'>This window "Time Table" is available for the period
+                from "08-08-2020 " to "31-12-2022" only</td>
+        </tr>
+        <table>
+            <div class=plum_fieldbig style='padding-top:7px;text-align:center;'>
+                <form method='Post' name=f1 id=f1><b>Time Table.</b>&emsp;<a class='plum_button'
+                        href='javascript:if (document.getElementById("f1"))document.getElementById("f1").style.display="none";window.print()'>&nbsp;Print</a><br><br>Year:
+                    <select name='year' id='year' caption='' class='plum_combo' style='width:70px;' disabled
+                        mandatory='0'>
+                        <option value=''> Select ...</option>
+                        <option value='2022-23'>2022-23</option>
+                        <option value='2021-22' selected>2021-22</option>
+                        <option value='2020-21'>2020-21</option>
+                    </select>
+                    <input type='hidden' name='enc_year' id='enc_year'
+                        value='7uNevcHxadTjqkBHsBzRdNLjf6+Y4ynIlmazxxSUlwSJ18MXe38AN2A3KusrmznG'> &nbsp;&nbsp; Sem:
+                    <select name='sem' id='sem' style='width:60px;' class=plum_combo>
+                        <option value='1'>1</option>
+                        <option value='2' selected>2</option>
+                        <option value='3'>3</option>
+                        <option value='4'>4</option>
+                        <option value='5'>5</option>
+                        <option value='6'>6</option>
+                        <option value='7'>7</option>
+                        <option value='8'>8</option>
+                    </select>
+                    <input type='hidden' name='enc_sem' id='enc_sem'
+                        value='bzngIXTD9NKptsurOuT2uYprJ8s+eXSclGX1b2PhazVDcfyHHauhgUP/eBD9QWYu'>&nbsp;&nbsp; Section:
+                    <select name='sec' id='sec' caption='' class='plum_combo' style='width:50px;' required
+                        mandatory='0'>
+                        <option value=''> Select ...</option>
+                        <option value='1'>1</option>
+                        <option value='2' selected>2</option>
+                        <option value='3'>3</option>
+                        <option value='4'>4</option>
+                        <option value='5'>5</option>
+                        <option value='6'>6</option>
+                    </select>
+                    <input type='hidden' name='enc_sec' id='enc_sec'
+                        value='bzngIXTD9NKptsurOuT2uYz/0VHiTYoHt6xnRp1vpUmd8oPxyv+a052GPyiurfOj'> &nbsp; Degree: <select
+                        name='degree' id='degree' caption='' class='width:65px;' style='width:150px;'
+                        mandatory='plum_combo'>
+                        <option value='B.E.'>B.E.</option>
+                        <option value='B.F.Tech'>B.F.Tech</option>
+                        <option value='B.Tech.' selected>BACHELOR OF TECHNOLOGY</option>
+                        <option value='BACHELOR OF ARCHITECTURE'>BACHELOR OF ARCHITECTURE</option>
+                        <option value='BACHELOR OF DESIGN'>BACHELOR OF DESIGN</option>
+                        <option value='BBA'>BACHELOR OF BUSINESS ADMINISTRATION</option>
+                        <option value='M.Tech (EXECUTIVE)'>MASTER OF TECHNOLOGY (EXECUTIVE)</option>
+                        <option value='M.Tech (FULL TIME)'>MASTER OF TECHNOLOGY</option>
+                        <option value='M.Tech (PART TIME)'>MASTER OF TECHNOLOGY (PART TIME)</option>
+                        <option value='MASTER OF SCIENCE'>MASTER OF SCIENCE</option>
+                        <option value='MBA'>MASTER OF BUSINESS ADMINISTRATION</option>
+                        <option value='Ph.D'>DOCTOR OF PHILOSOPHY</option>
+                    </select>
+                    <input type='hidden' name='enc_degree' id='enc_degree'
+                        value='28OoeWalqEbQ7QDbsK6rkGO5oBtJ3qS2R/LnvgY8Wrv5vonBCcrsZyZdonEZGVG3g0/y/4WsV9b4td7EmLvmMQO3zmm5tW+lL4lVsak1GVrOvNkJCFr2YEDX/jS6G1XUknOGVcF0473hn6DMLf+FGt4BIDXGf3IuEzH/A1QYfWINqHFg1mXpttvSrncINmJnfkE4Yv6N9x8OzFdcV3vhOpiBMQc36ye2Xto+CarPIsQEKvhmwQXdhD2IOC+KD3xc'>&nbsp;
+                    Department <select name='subdepartment' id='subdepartment' caption='' class='plum_combo'
+                        style='width:155px;' required mandatory='0'>
+                        <option value=''> Select ...</option>
+                        <option value='APPLIED SCIENCES AND HUMANITIES'>APPLIED SCIENCES AND HUMANITIES (WEST)</option>
+                        <option value='ARCHITECTURE AND PLANNING'>ARCHITECTURE AND PLANNING</option>
+                        <option value='BIO TECHNOLOGY'>BIO TECHNOLOGY</option>
+                        <option value='BIOLOGICAL SCIENCES AND ENGINEERING'>BIOLOGICAL SCIENCES AND ENGINEERING</option>
+                        <option value='CHEMISTRY'>CHEMISTRY</option>
+                        <option value='CIVIL ENGINEERING'>CIVIL ENGINEERING</option>
+                        <option value='COMPUTER ENGINEERING'>COMPUTER ENGINEERING</option>
+                        <option value='COMPUTER SCIENCE AND ENGINEERING'>COMPUTER SCIENCE AND ENGINEERING</option>
+                        <option value='COMPUTER SCIENCE AND ENGINEERING(EAST)'>COMPUTER SCIENCE AND ENGINEERING(EAST)
+                        </option>
+                        <option value='DEAN PG STUDIES'>DEAN PG STUDIES</option>
+                        <option value='DEAN UG STUDIES'>DEAN UG STUDIES</option>
+                        <option value='DESIGN'>DESIGN</option>
+                        <option value='ELECTRICAL ENGINEERING'>ELECTRICAL ENGINEERING</option>
+                        <option value='ELECTRONICS AND COMMUNICATION ENGINEERING'>ELECTRONICS AND COMMUNICATION
+                            ENGINEERING</option>
+                        <option value='ELECTRONICS AND COMMUNICATION ENGINEERING(EAST)'>ELECTRONICS AND COMMUNICATION
+                            ENGINEERING(EAST)</option>
+                        <option value='FACULTY OF ARCHITECTURE AND DESIGN'>FACULTY OF ARCHITECTURE AND DESIGN</option>
+                        <option value='HUMANITIES AND SOCIAL SCIENCES'>HUMANITIES AND SOCIAL SCIENCES</option>
+                        <option value='INFORMATION TECHNOLOGY' selected>INFORMATION TECHNOLOGY</option>
+                        <option value='INFORMATION TECHNOLOGY(WEST)'>INFORMATION TECHNOLOGY(WEST)</option>
+                        <option value='INNOVATION AND ENTREPRENEURSHIP VENTURE DEVELOPMENT'>INNOVATION AND
+                            ENTREPRENEURSHIP VENTURE DEVELOPMENT</option>
+                        <option value='INSTRUMENTATION AND CONTROL ENGINEERING'>INSTRUMENTATION AND CONTROL ENGINEERING
+                        </option>
+                        <option value='MANAGEMENT'>MANAGEMENT</option>
+                        <option value='MANAGEMENT STUDIES'>MANAGEMENT STUDIES</option>
+                        <option value='MANUFACTURING PROCESSES AND AUTOMATION ENGINEERING'>MANUFACTURING PROCESSES AND
+                            AUTOMATION ENGINEERING</option>
+                        <option value='MATHEMATICS'>MATHEMATICS</option>
+                        <option value='MECHANICAL ENGINEERING'>MECHANICAL ENGINEERING</option>
+                        <option value='MECHANICAL ENGINEERING(WEST)'>MECHANICAL ENGINEERING(WEST)</option>
+                        <option value='PERSONALITY DEVELOPMENT'>PERSONALITY DEVELOPMENT</option>
+                        <option value='PHYSICS'>PHYSICS</option>
+                        <option value='SCHOOL OF APPLIED SCIENCES'>SCHOOL OF APPLIED SCIENCES</option>
+                    </select>
+                    <input type='hidden' name='enc_subdepartment' id='enc_subdepartment'
+                        value='yH5L1mq2clO40asFO1CPUA7iI2KHYV4uPiApEa58VDSfNokD2oXxcgpFkiCSTGXk1MdBX1YlWnJJb6pnnxXdjUhMws4xwJR6PHLtRyw8JdbNwXPE/0o+MZsIVexXpToBdbAG6Al3hDLDLNw5RQAjUowaUSck+PauGh6yLNTkyx4UJzcqImNlZp/vvLpFQesjWzy9V9wOJ63Hs0NhrThbPtztya7bRDN3qDPQprw1d+Nd2daW4S3s0gPv8Utf0EDno3C7YKd8fltG4dhDcp+9m0NQpFzVjqw6rU2gVV/l2WXDMvLxpBmgqDqaZ4QbRsjuaG5bduX2431TQetkm+7kVtYYWOt7QnqDyQZHnqIRP21oK51CQ1NDh9wEZELJgxP0coQnOfE64qHoKaGgign9iesn98e20sTwN7PJT5q0m9jBZMaZQC7B1SxuCDkiyLNfRYJJWpqn0PV0eJRLElTOMNAnmouX8il3McmJbLGIfUIBVFJukKNbc/tiG6DH8ekfAFGJJ/0hZYVvCLgzD2tJfdk2L30+Un4kft903DQYLAbora/Zm3Q3uqX/9ZVT78CHErhuRaOUUSn4HAqb1u3MAInzWxuVcf3+c/4Ssj9K5gkb3feYVu+3y3Prl32k+G0/RmGK5fOrIkwcA7ZXk5cIZpJp8uQCaNUcgc4KoXP/rc92PREQBpH0jHHHKXegSKOnEU3j9jtwQF0EWTr+rriziEswCEyGuMSmCQ2oB7OyMTgH9FlDytA2dZ4WGpkDjM0IleR7ArhRNr8sPnoOOVfkkfAi/RiXH8plq9dkddNrqT0kVAb2KElJta4O+FQ4wBLqfBVjdmO8T7eUWws6wvDxQZKWhbaCbfcqu8ymcMCZML43Ewe+Iql5ZLA0ofJESw9JxmIxiwADEKHiF7wZDhP1i3LErcJzTKGNL+XvF7j6DqorWxw0o4H1yMOXP5HcrnayGXC/NTJ9PwAgaJx1MJJo6wmbSZgi90H80cuE3Oi4SjtrWUfzwgv4LmZLilufL2HGmBFyaQztXRu8X37hcGMKx14QrDJxBKZqJ4EzkkkklS0b5ShjnL8fVVcIzxF7mHRTtCcdEQeurX/drtnrjzdctIfLhylSgptEc0KSkdcqcGU='>&nbsp;
+                    Spec: <select name='spec' id='spec' caption='' class='plum_combo' style='width:150px;'
+                        mandatory='0'>
+                        <option value=''> Select ...</option>
+                        <option value='ARTIFICIAL INTELLIGENCE'>ARTIFICIAL INTELLIGENCE</option>
+                        <option value='BACHELOR OF ARCHITECTURE'>BACHELOR OF ARCHITECTURE</option>
+                        <option value='BACHELOR OF BUSINESS ADMINISTRATION'>BACHELOR OF BUSINESS ADMINISTRATION</option>
+                        <option value='BACHELOR OF FASHION TECHNOLOGY'>BACHELOR OF FASHION TECHNOLOGY</option>
+                        <option value='BIO TECHNOLOGY'>BIO TECHNOLOGY</option>
+                        <option value='BIOCHEMICAL ENGINEERING'>BIOCHEMICAL ENGINEERING</option>
+                        <option value='BIOINFORMATICS'>BIOINFORMATICS</option>
+                        <option value='BIOLOGICAL SCIENCES AND ENGINEERING'>BIOLOGICAL SCIENCES AND ENGINEERING</option>
+                        <option value='CAD/CAM'>CAD/CAM</option>
+                        <option value='CHEMISTRY'>CHEMISTRY</option>
+                        <option value='CIVIL ENGINEERING'>CIVIL ENGINEERING</option>
+                        <option value='COMMUNICATION AND NETWORKS'>COMMUNICATION AND NETWORKS</option>
+                        <option value='COMPUTER ENGINEERING'>COMPUTER ENGINEERING</option>
+                        <option value='COMPUTER SCIENCE'>COMPUTER SCIENCE</option>
+                        <option value='COMPUTER SCIENCE AND ENGINEERING'>COMPUTER SCIENCE AND ENGINEERING</option>
+                        <option value='COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)'>COMPUTER SCIENCE AND
+                            ENGINEERING (ARTIFICIAL INTELLIGENCE)</option>
+                        <option value='COMPUTER SCIENCE AND ENGINEERING (BIG DATA ANALYTICS)'>COMPUTER SCIENCE AND
+                            ENGINEERING (BIG DATA ANALYTICS)</option>
+                        <option value='COMPUTER SCIENCE AND ENGINEERING (DATA SCIENCE)'>COMPUTER SCIENCE AND ENGINEERING
+                            (DATA SCIENCE)</option>
+                        <option value='COMPUTER SCIENCE AND ENGINEERING (INTERNET OF THINGS)'>COMPUTER SCIENCE AND
+                            ENGINEERING (INTERNET OF THINGS)</option>
+                        <option value='DESIGN'>DESIGN</option>
+                        <option value='DIGITAL COMMUNICATIONS'>DIGITAL COMMUNICATIONS</option>
+                        <option value='ELECTRICAL ENGINEERING'>ELECTRICAL ENGINEERING</option>
+                        <option value='ELECTRONICS AND COMMUNICATION ENGINEERING'>ELECTRONICS AND COMMUNICATION
+                            ENGINEERING</option>
+                        <option
+                            value='ELECTRONICS AND COMMUNICATION ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)'>
+                            ELECTRONICS AND COMMUNICATION ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)
+                        </option>
+                        <option value='ELECTRONICS AND COMMUNICATION ENGINEERING (INTERNET OF THINGS)'>ELECTRONICS AND
+                            COMMUNICATION ENGINEERING (INTERNET OF THINGS)</option>
+                        <option value='EMBEDDED SYSTEM AND VLSI'>EMBEDDED SYSTEM AND VLSI</option>
+                        <option value='ENGINEERING MANAGEMENT'>ENGINEERING MANAGEMENT</option>
+                        <option value='ENVIRONMENTAL ENGINEERING'>ENVIRONMENTAL ENGINEERING</option>
+                        <option value='FASHION TECHNOLOGY'>FASHION TECHNOLOGY</option>
+                        <option value='GEOINFORMATICS'>GEOINFORMATICS</option>
+                        <option value='HUMANITIES AND SOCIAL SCIENCES'>HUMANITIES AND SOCIAL SCIENCES</option>
+                        <option value='INDUSTRIAL ELECTRONICS'>INDUSTRIAL ELECTRONICS</option>
+                        <option value='INFORMATION SECURITY'>INFORMATION SECURITY</option>
+                        <option value='INFORMATION SYSTEMS'>INFORMATION SYSTEMS</option>
+                        <option value='INFORMATION TECHNOLOGY' selected>INFORMATION TECHNOLOGY</option>
+                        <option value='INFORMATION TECHNOLOGY (INTERNET OF THINGS)'>INFORMATION TECHNOLOGY (INTERNET OF
+                            THINGS)</option>
+                        <option value='INFORMATION TECHNOLOGY (NETWORK AND INFORMATION SECURITY)'>INFORMATION TECHNOLOGY
+                            (NETWORK AND INFORMATION SECURITY)</option>
+                        <option value='INSTRUMENTATION AND CONTROL ENGINEERING'>INSTRUMENTATION AND CONTROL ENGINEERING
+                        </option>
+                        <option value='MANAGEMENT STUDIES'>MANAGEMENT STUDIES</option>
+                        <option value='MANUFACTURING PROCESSES AND AUTOMATION ENGINEERING'>MANUFACTURING PROCESSES AND
+                            AUTOMATION ENGINEERING</option>
+                        <option value='MASTER OF BUSINESS ADMINISTRATION'>MASTER OF BUSINESS ADMINISTRATION</option>
+                        <option value='MATHEMATICS'>MATHEMATICS</option>
+                        <option value='MATHEMATICS AND COMPUTING'>MATHEMATICS AND COMPUTING</option>
+                        <option value='MBA IN INNOVATION, ENTREPRENEURSHIP, AND VENTURE DEVELOPMENT'>MBA IN INNOVATION,
+                            ENTREPRENEURSHIP, AND VENTURE DEVELOPMENT</option>
+                        <option value='MECHANICAL ENGINEERING'>MECHANICAL ENGINEERING</option>
+                        <option value='MECHANICAL ENGINEERING (ELECTRIC VEHICLES)'>MECHANICAL ENGINEERING (ELECTRIC
+                            VEHICLES)</option>
+                        <option value='MECHATRONICS'>MECHATRONICS</option>
+                        <option value='MOBILE COMPUTING AND DATA ANALYTICS'>MOBILE COMPUTING AND DATA ANALYTICS</option>
+                        <option value='NANO TECHNOLOGY'>NANO TECHNOLOGY</option>
+                        <option value='PHYSICS'>PHYSICS</option>
+                        <option value='PROCESS CONTROL'>PROCESS CONTROL</option>
+                        <option value='PRODUCTION ENGINEERING'>PRODUCTION ENGINEERING</option>
+                        <option value='SIGNAL PROCESSING'>SIGNAL PROCESSING</option>
+                    </select>
+                    <input type='hidden' name='enc_spec' id='enc_spec'
+                        value='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'>&nbsp;Day
+                    : <select name='wkd' id='wkd' style='width:60px;' class=plum_combo>
+                        <option value='Mon' selected>Mon</option>
+                        <option value='Tue'>Tue</option>
+                        <option value='Wed'>Wed</option>
+                        <option value='Thu'>Thu</option>
+                        <option value='Fri'>Fri</option>
+                        <option value='Sat'>Sat</option>
+                    </select>
+                    <input type='hidden' name='enc_wkd' id='enc_wkd'
+                        value='85xUbaE6iRZVx9lB/5jxcdDdENFhdJY9G9TbynqdA4T1vqJ9X2ad5aGxIlkf7wlC'><input type='submit'
+                        name='submit' value='Go'>
+                </form>
+            </div><br><br><br><br><br>
+            <table width='98%' align=center border=1 style='border-collapse:collapse;' cellspacing=0 cellpadding=3
+                class='plum_fieldbig'>
+                <tbody>
+                    <tr align=center class='plum_head'>
+                        <td colspan=13>( Year : 2021-22 &nbsp;Sem : 2&nbsp;Degree : B.Tech. (INFORMATION
+                            TECHNOLOGY)&nbsp;Department :INFORMATION TECHNOLOGY &nbsp;&nbsp;Spec : INFORMATION
+                            TECHNOLOGY&nbsp;&nbsp;Section : 2)<br>Time Table (CORE)</td>
+                    </tr>
+                    <tr align=center>
+                        <td style='max-width:10px;'></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T1<br>08:00-09:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T2<br>09:00-10:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T3<br>10:00-11:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T4<br>11:00-12:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T5<br>12:00-01:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T6<br>01:00-02:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T7<br>02:00-03:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T8<br>03:00-04:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T9<br>04:00-05:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T10<br>05:00-06:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T11<br>06:00-07:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T12<br>07:00-08:00</b></td>
+                        <td align=center class='plum_fieldbig ' nowrap><b>T13<br>08:00-09:00</b></td>
+                    </tr>
+                    <tr>
+                        <td align='center'><b>Mon</b></td>
+                        <td align=center class='plum_fieldbig'>
+                        </td>
+                        <td align=center class='plum_fieldbig'>ITITC03 / APJ-04
+                        </td>
+                        <td align=center class='plum_fieldbig'>FCCH008(Grp-1) / 6319
+                            <hr>FCPH004(Grp-2) / 6219
+                            <hr>FCCH008(Grp-2) / 6320
+                            <hr>FCCH008(Grp-2) / 6320
+                        </td>
+                        <td align=center class='plum_fieldbig'>FCCH008(Grp-1) / 6319
+                            <hr>FCPH004(Grp-2) / 6219
+                            <hr>FCCH008(Grp-2) / 6320
+                            <hr>FCCH008(Grp-2) / 6320
+                        </td>
+                        <td align=center class='plum_fieldbig'>ITITC02 / APJ-04
+                        </td>
+                        <td align=center class='plum_fieldbig'>
+                        </td>
+                        <td align=center class='plum_fieldbig'>FCMT007(Tut-1) / NB (S-02)
+                            <hr>FCMT007(Tut-1) / NB (S-02)
+                            <hr>FCMT007(Tut-2) / NB (S-02)
+                            <hr>FCMT007(Tut-2) / NB (S-02)
+                        </td>
+                        <td align=center class='plum_fieldbig'>
+                        </td>
+                        <td align=center class='plum_fieldbig'>ITECC01 / APJ-04
+                        </td>
+                        <td align=center class='plum_fieldbig'>FCCS002 / APJ-09
+                            <hr>FCHS005 / APJ-04
+                        </td>
+                        <td align=center class='plum_fieldbig'>
+                        </td>
+                        <td align=center class='plum_fieldbig'>
+                        </td>
+                        <td align=center class='plum_fieldbig'>
+                        </td>
+                    </tr>
+                </tbody>
+            </table><br>
+            <table width='98%' border=1 style='border-collapse:collapse;margin-left:15px;' cellspacing=0 cellpadding=3
+                class='plum_fieldbig'>
+                <tr>
+                    <td colspan=5 width=50%>FCCH008 - Environment Science and Green Chemistry (Sec-2/Grp-1) / NANCY
+                        GUPTA</td>
+                    <td colspan=5 width=50%>FCCH008 - Environment Science and Green Chemistry (Sec-2/Grp-2) / RITU</td>
+                </tr>
+                <tr>
+                    <td colspan=5 width=50%>FCCH008 - Environment Science and Green Chemistry (Sec-2/Grp-2) / UMA NARANG
+                    </td>
+                    <td colspan=5 width=50%>FCCS002 - Computer Programming / PRIYANKA MAAN</td>
+                </tr>
+                <tr>
+                    <td colspan=5 width=50%>FCHS005 - English / SATADRU CHATTERJEE</td>
+                    <td colspan=5 width=50%>FCMT007 - Mathematics-II (Sec-2/Tut-1) / AMITA SHARMA</td>
+                </tr>
+                <tr>
+                    <td colspan=5 width=50%>FCMT007 - Mathematics-II (Sec-2/Tut-1) / ANJALI</td>
+                    <td colspan=5 width=50%>FCMT007 - Mathematics-II (Sec-2/Tut-2) / AMITA SHARMA</td>
+                </tr>
+                <tr>
+                    <td colspan=5 width=50%>FCMT007 - Mathematics-II (Sec-2/Tut-2) / ANJALI</td>
+                    <td colspan=5 width=50%>FCPH004 - Physics (Sec-2/Grp-2) / VINOD KUMAR</td>
+                </tr>
+                <tr>
+                    <td colspan=5 width=50%>ITECC01 - Digital Logic Design / ANKIT GARG</td>
+                    <td colspan=5 width=50%>ITITC02 - Data Structures / APOORVI SOOD</td>
+                </tr>
+                <tr>
+                    <td colspan=5 width=50%>ITITC03 - Discrete Structures / PRITI BANSAL</td>
+                </tr>
+            </table><br>
+            <p style='page-break-before: always'></p>

@@ -38,11 +38,13 @@ class SubjectWiseAttnController extends GetxController {
   bool? getIsPresent(String attnMarkString) {
     if (attnMarkString == '0') {
       return false;
+    } else if (attnMarkString == '1' || attnMarkString == '2') {
+      return true;
     } else if (attnMarkString == '') {
       return null;
     }
 
-    return true;
+    return null;
   }
 
   // TODO implement this logic

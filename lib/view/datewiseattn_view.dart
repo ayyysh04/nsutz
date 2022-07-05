@@ -98,11 +98,13 @@ class DatewiseAttnView extends GetView<DatewiseAttnController> {
                       child: ListView.builder(
                           physics: BouncingScrollPhysics(),
                           controller: ScrollController(),
-                          itemCount: controller.attnData.length,
+                          itemCount: controller.datewise.length,
                           itemBuilder: (BuildContext context, int index) {
+                            String date =
+                                controller.datewise.keys.elementAt(index);
                             return SubAttnCard(
-                              subAttnData: controller.attnData[index],
-                            );
+                                date: date,
+                                subDateAttnData: controller.datewise[date]!);
                           }),
                     );
                   }),

@@ -30,4 +30,8 @@ class AttendanceSerivce {
     attendanceData = res.data!["attnData"];
     return null;
   }
+
+  void resetAttenanceData() {
+    attendanceData = [];
+  }
 }

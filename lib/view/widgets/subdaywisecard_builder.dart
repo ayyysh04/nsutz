@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 
 import 'package:nsutz/controller/subjectwiseattn_controller.dart';
@@ -12,18 +13,27 @@ class SubDayCardListBuilder extends GetView<SubjectWiseAttnController> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      controller: ScrollController(),
-      physics: BouncingScrollPhysics(),
-      itemCount: controller.subAttnData.details!.length,
-      itemBuilder: (context, itemNo) {
-        return SubDayCard(
-          ispresent: controller.getIsPresent(
-              controller.subAttnData.details![itemNo].values.first),
-          date: controller.subAttnData.details![itemNo].keys.first,
-          attnMarkString: controller.subAttnData.details![itemNo].values.first,
-        );
-      },
+    return AnimationLimiter(
+      child: ListView.builder(
+        controller: ScrollController(),
+        physics: BouncingScrollPhysics(),
+        itemCount: controller.subAttnData.details!.length,
+        itemBuilder: (context, itemNo) {
+          return AnimationConfiguration.staggeredList(
+              position: itemNo,
+              duration: const Duration(milliseconds: 375),
+              child: SlideAnimation(
+                  verticalOffset: 80.0,
+                  child: FadeInAnimation(
+                      child: SubDayCard(
+                    ispresent: controller.getIsPresent(
+                        controller.subAttnData.details![itemNo].values.first),
+                    date: controller.subAttnData.details![itemNo].keys.first,
+                    attnMarkString:
+                        controller.subAttnData.details![itemNo].values.first,
+                  ))));
+        },
+      ),
     );
   }
 }

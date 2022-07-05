@@ -4,9 +4,11 @@ class AttendanceModel {
   String? overallAbsent;
   String? overallClasses;
   double? overallPercentage;
+  String? subjectName;
 
   List<Map<String, String>>? details;
   AttendanceModel({
+    this.subjectName,
     this.subjectCode,
     this.overallPresent,
     this.overallAbsent,

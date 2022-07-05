@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
-import 'package:nsutz/controller/capthca_controller.dart';
+import 'package:nsutz/controller/captcha_controller.dart';
 import 'package:nsutz/controller/dashboard_controller.dart';
 import 'package:nsutz/controller/datewiseattn_controller.dart';
+import 'package:nsutz/controller/loading_controller.dart';
 import 'package:nsutz/controller/login_controller.dart';
+import 'package:nsutz/controller/notice_controller.dart';
 import 'package:nsutz/controller/splash_controller.dart';
 import 'package:nsutz/controller/studentprofile_controller.dart';
 import 'package:nsutz/controller/subjectwiseattn_controller.dart';
@@ -27,9 +29,9 @@ class InitialBinding extends Bindings {
     // Get.lazyPut(() => StudentProfileSerivce(), fenix: false);
     // Get.lazyPut(() => AttendanceSerivce(), fenix: false);
 
+    //core services
     Get.put(NsutApi());
     Get.put(SharedPrefs());
-    Get.put(CreditionalSerivce());
     Get.put(SessionSerivce());
     Get.put(StudentProfileSerivce());
     Get.put(AttendanceSerivce());
@@ -82,5 +84,19 @@ class StudentProfileBinding implements Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => StudentProfileCotnroller());
+  }
+}
+
+class LoadingBinding implements Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => LoadingController());
+  }
+}
+
+class NoticeBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => NoticeController());
   }
 }

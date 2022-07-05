@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:nsutz/controller/datewiseattn_controller.dart';
 import 'package:nsutz/theme/constants.dart';
 
-class SubAttnCard extends StatelessWidget {
-  const SubAttnCard({Key? key, required this.subAttnData}) : super(key: key);
-  final Map subAttnData;
+class SubAttnCard extends GetView<DatewiseAttnController> {
+  const SubAttnCard(
+      {Key? key, required this.subDateAttnData, required this.date})
+      : super(key: key);
+  final List<String> subDateAttnData;
+  final String date;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -22,7 +27,7 @@ class SubAttnCard extends StatelessWidget {
           children: <Widget>[
             //Date heading
             Text(
-              subAttnData['date'].toString(),
+              date,
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Questrial',
@@ -30,7 +35,7 @@ class SubAttnCard extends StatelessWidget {
                   fontSize: 50.sp),
             ),
             //attendance body
-            subjectHeadingBuilder(subAttnData['attn'] as List)
+            subjectHeadingBuilder(subDateAttnData)
           ],
         ),
       ),
@@ -44,31 +49,44 @@ class SubAttnCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 25.h),
         physics: NeverScrollableScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
-          String heading = allSubAttn[index].keys.first;
-          String value = allSubAttn[index].values.first;
+          String heading = controller.subjects[index];
+          String value = allSubAttn[index];
           return Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  heading,
-                  softWrap: true,
-                  // overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 48.sp,
-                    fontFamily: 'Questrial',
+                SizedBox(
+                  width: 490.w,
+                  child: Text(
+                    heading,
+                    softWrap: true,
+                    // overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 48.sp,
+                      fontFamily: 'Questrial',
+                    ),
                   ),
                 ),
-                (value == 'P')
-                    ? Icon(
-                        Icons.check,
-                        color: kLightgreen,
-                      )
-                    : Icon(
-                        Icons.close,
-                        color: kLightred,
-                      ),
+                SizedBox(
+                  width: 390.w,
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 48.sp,
+                      fontFamily: 'Questrial',
+                    ),
+                  ),
+                ),
+                // (value == 'P')
+                //     ? Icon(
+                //         Icons.check,
+                //         color: kLightgreen,
+                //       )
+                //     : Icon(
+                //         Icons.close,
+                //         color: kLightred,
+                //       ),
               ],
             ),
           );

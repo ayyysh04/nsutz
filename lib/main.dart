@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:nsutz/routes/routes.dart';
 import 'package:nsutz/routes/routes_const.dart';
 import 'package:nsutz/services/binding.dart';
+import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/theme/themes.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {});
-
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: kBackgroundcolor,
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
   runApp(ScreenUtilInit(
       designSize: Size(1080, 2340), builder: (_, __) => MyApp()));
 }

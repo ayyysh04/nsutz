@@ -66,8 +66,12 @@ class DashboardController extends GetxController {
     // );
   }
 
-  void openSubdayWise(String subject, double overallPer) {
-    Get.toNamed(Routes.SUBWISEATTN, arguments: {"subName": subject});
+  void openSubdayWise(
+      {required String subName,
+      required double overallPer,
+      required String subCode}) {
+    Get.toNamed(Routes.SUBWISEATTN,
+        arguments: {"subName": subName, "subCode": subCode});
   }
 
   void openStuentProfile() {

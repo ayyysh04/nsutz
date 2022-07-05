@@ -6,9 +6,12 @@ import 'package:nsutz/services/studentprofile_service.dart';
 
 class LoginController extends GetxController {
   String? msg;
-  bool collegeenabled = false;
   bool showCollegeError = false;
-  bool? isLoading;
+  bool isLoading = false;
+  String? captchaLink;
+  FocusNode rollNoFocusNode = FocusNode();
+  FocusNode passFocusNode = FocusNode();
+  FocusNode captchaNoFocusNode = FocusNode();
   TextEditingController rollNoController =
       TextEditingController(text: "2020UEI2838");
   TextEditingController passController =
@@ -22,11 +25,17 @@ class LoginController extends GetxController {
   final SessionSerivce _sessionSerivce = Get.find<SessionSerivce>();
 
   Future<String?> getCaptcha() async {
-    await _sessionSerivce.startSessionService();
-    return await _sessionSerivce.getCaptcha();
+    captchaLink ??= await _sessionSerivce.getCaptcha();
+    return captchaLink;
   }
 
   //functions
+  void reloadCaptcha() {
+    captchaLink = null;
+    captchaController.clear();
+    update();
+  }
+
   void login() async {
     if (isLoading == true) //no more calls when already loading
     {
@@ -36,7 +45,9 @@ class LoginController extends GetxController {
     update();
 
     var res = await _sessionSerivce.login(
-        rollNoController.text, passController.text, captchaController.text);
+        rollno: rollNoController.text,
+        password: passController.text,
+        captcha: captchaController.text);
     //save login id and pass  and other things in local storage
     //TODO: How to sync the local stored data with new data
 
@@ -46,8 +57,7 @@ class LoginController extends GetxController {
     } else {
       isLoading = false;
       msg = res;
-      passController.clear();
-      captchaController.clear();
+      // passController.clear();
       update();
     }
   }

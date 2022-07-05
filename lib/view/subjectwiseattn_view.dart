@@ -6,8 +6,13 @@ import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/view/widgets/subdaywisecard_builder.dart';
 
 class SubjectWiseAttnView extends GetView<SubjectWiseAttnController> {
+  final String subjectCode;
   final String subjectName;
-  SubjectWiseAttnView({Key? key, required this.subjectName}) : super(key: key);
+  SubjectWiseAttnView({
+    Key? key,
+    required this.subjectCode,
+    required this.subjectName,
+  }) : super(key: key);
   final DateTime todayDate = DateTime.now();
   @override
   Widget build(BuildContext context) {
@@ -17,7 +22,13 @@ class SubjectWiseAttnView extends GetView<SubjectWiseAttnController> {
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         centerTitle: true,
-        title: Text(subjectName),
+        title: Text(
+          subjectCode,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Questrial',
+          ),
+        ),
         actions: [
           GestureDetector(
             onTap: controller.refreshAttnData,
@@ -30,13 +41,28 @@ class SubjectWiseAttnView extends GetView<SubjectWiseAttnController> {
             width: 40.w,
           )
         ],
+        bottom: PreferredSize(
+          child: Expanded(
+            child: Center(
+              child: Text(
+                subjectName,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Questrial',
+                  fontSize: 60.sp,
+                ),
+              ),
+            ),
+          ),
+          preferredSize: Size(0.0, 110.h),
+        ),
       ),
       body: SafeArea(
         child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 30.h),
             child: GetBuilder<SubjectWiseAttnController>(builder: (_) {
               return FutureBuilder<String>(
-                  future: controller.getStudentAttendance(subjectName),
+                  future: controller.getStudentAttendance(subjectCode),
                   builder: ((context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(

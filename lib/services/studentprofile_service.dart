@@ -20,4 +20,8 @@ class StudentProfileSerivce {
 
     return null;
   }
+
+  void resetProfileData() {
+    studentData = Student();
+  }
 }

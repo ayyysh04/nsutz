@@ -5,11 +5,32 @@ import 'package:nsutz/theme/constants.dart';
 
 //TODO: implemntation
 class DatewiseAttnController extends GetxController {
+  @override
+  void onInit() {
+    setDateWiseAttn();
+    super.onInit();
+  }
+
   //serives
   final AttendanceSerivce _attendanceSerivce = Get.find<AttendanceSerivce>();
 
   //functions
   // get subAttnData => _attendanceSerivce.attendanceData;
+
+  Map<String, List<String>> datewise = {};
+  List subjects = [];
+  setDateWiseAttn() {
+    for (var attnData in _attendanceSerivce.attendanceData) {
+      subjects.add(attnData.subjectName);
+      for (var subattnData in attnData.details!) {
+        if (datewise[subattnData.keys.first] == null) {
+          datewise[subattnData.keys.first] = [];
+        }
+        datewise[subattnData.keys.first]!.add(subattnData.values.first);
+      }
+    }
+  }
+
   List attnData = [
     {
       'date': "25 Jun 2022",
@@ -28,7 +49,15 @@ class DatewiseAttnController extends GetxController {
       ]
     }
   ];
+//list of sub
+// [{
+//   "date":"preset",
+//   "date2":"presetn"
+// },
+// {
 
+// }
+// ]
   List tempAttnData = [];
 
   //data wise utils/servies

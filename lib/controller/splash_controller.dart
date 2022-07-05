@@ -1,3 +1,4 @@
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:nsutz/routes/routes_const.dart';
 import 'package:nsutz/services/session_service.dart';
@@ -10,9 +11,10 @@ class SplashController extends GetxController {
   final StudentProfileSerivce _studentProfileSerivce =
       Get.find<StudentProfileSerivce>();
 
-  Future checkLoginAndNavigate() async {
+  Future<void> checkLoginAndNavigate() async {
     await _sharedPrefsService.init();
     var check = await _sessionSerivce.resumeLogin();
+
     if (check !=
         null) //TODO:remove isLogin and use rollNo and password as its replacement
     {
@@ -25,6 +27,6 @@ class SplashController extends GetxController {
     } else {
       Get.offNamed(Routes.LOGIN);
     }
-    return;
+    FlutterNativeSplash.remove();
   }
 }

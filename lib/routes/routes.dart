@@ -4,7 +4,10 @@ import 'package:nsutz/services/binding.dart';
 import 'package:nsutz/view/captcha_view.dart';
 import 'package:nsutz/view/dashboard_view.dart';
 import 'package:nsutz/view/datewiseattn_view.dart';
+import 'package:nsutz/view/loading_view.dart';
 import 'package:nsutz/view/login_view.dart';
+import 'package:nsutz/view/notice_view.dart';
+import 'package:nsutz/view/pdf_view.dart';
 import 'package:nsutz/view/profile_view.dart';
 import 'package:nsutz/view/splash_view.dart';
 import 'package:nsutz/view/subjectwiseattn_view.dart';
@@ -12,9 +15,10 @@ import 'package:nsutz/view/subjectwiseattn_view.dart';
 class RoutePages {
   static final List<GetPage> pages = [
     GetPage(
-        name: Routes.SPLASH,
-        page: () => SplashView(),
-        binding: SplashBinding()),
+      name: Routes.SPLASH,
+      page: () => SplashView(),
+      binding: SplashBinding(),
+    ),
     GetPage(
         name: Routes.CAPTCHA,
         page: () => CaptchaView(),
@@ -39,9 +43,31 @@ class RoutePages {
       binding: StudentProfileBinding(),
     ),
     GetPage(
+      name: Routes.LOADING,
+      page: () => LoadingView(),
+      binding: LoadingBinding(),
+    ),
+    GetPage(
+      name: Routes.NOTICE,
+      page: () => NoticeView(),
+      binding: NoticeBinding(),
+    ),
+    GetPage(
+      name: Routes.PDF,
+      page: () {
+        return PDFViewer(
+          url: Get.arguments["url"],
+          headers: Get.arguments["headers"],
+          notice: Get.arguments["notice"],
+        );
+      },
+      binding: NoticeBinding(),
+    ),
+    GetPage(
       name: Routes.SUBWISEATTN,
       page: () {
         return SubjectWiseAttnView(
+          subjectCode: Get.arguments["subCode"],
           subjectName: Get.arguments["subName"],
         );
       },
