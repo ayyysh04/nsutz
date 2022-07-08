@@ -17,7 +17,8 @@ class DashboardController extends GetxController {
   //functions
 
 //TODO: remove attnDat getter ,make seprate function for length ,and to retrive a particular item rather giving whole data
-  List<AttendanceModel> get attnData => _attendanceSerivce.attendanceData;
+  List<AttendanceModelSubWise> get attnData =>
+      _attendanceSerivce.attendanceData;
 
   String getGreetingName() {
     return _profileSerivce.studentData.studentName!;

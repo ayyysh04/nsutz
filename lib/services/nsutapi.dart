@@ -314,8 +314,10 @@ class NsutApi {
       var subjectElement = trPlumhead[2];
       if (subjectElement.children.length == 2) {
         // return CustomResponse(error: "No attendance to fetch");
-        return CustomResponse(
-            data: {"attnData": <AttendanceModel>[], "semNo": semesterNo});
+        return CustomResponse(data: {
+          "attnData": <AttendanceModelSubWise>[],
+          "semNo": semesterNo
+        });
       }
 
       //table overall elements
@@ -352,11 +354,11 @@ class NsutApi {
 
       //tabe tr elements
       var tr = attendanceDoc.querySelectorAll("tr:not(.plum_head)");
-      List<AttendanceModel> attendanceData = [];
+      List<AttendanceModelSubWise> attendanceData = [];
       for (var i = 1; i < subjectElement.children.length; i++) {
         //assigning to model
 
-        attendanceData.add(AttendanceModel(
+        attendanceData.add(AttendanceModelSubWise(
             details: [],
             subjectName: subCodeEquvalent[i - 1].split("-")[1],
             subjectCode: subjectElement.children[i].text,
@@ -379,8 +381,14 @@ class NsutApi {
               i < td.length;
               i++) //no of subjects wise loop -> 0th index will be date
           {
-            String fullLegend = attnMarkEquivalent[td[i].text] ?? td[i].text;
-            attendanceData[i - 1].details!.add({td[0].text: fullLegend});
+            // String fullLegend = attnMarkEquivalent[td[i].text] ?? td[i].text;
+            // attendanceData[i - 1].details!.add({td[0].text: fullLegend});
+            if (td[i].text == '') //no attendance marked case
+            {
+              attendanceData[i - 1].details!.add({td[0].text: 'NM'});
+            } else {
+              attendanceData[i - 1].details!.add({td[0].text: td[i].text});
+            }
           }
         }
       }
@@ -472,14 +480,16 @@ class NsutApi {
           if (rowChildren[1].querySelector('a') == null) {
             noticesLink.add(NoticeModel(
                 notice: rowChildren[1].children[0].text,
-                publishedBy: rowChildren[1].children[2].text,
+                publishedBy:
+                    rowChildren[1].children[2].text.split("Published By:")[1],
                 date: rowChildren[0].text));
           } else {
             noticesLink.add(NoticeModel(
               date: rowChildren[0].text,
               notice: rowChildren[1].children[0].text,
               url: rowChildren[1].children[0].attributes["href"]!,
-              publishedBy: rowChildren[1].children[2].text,
+              publishedBy:
+                  rowChildren[1].children[2].text.split("Published By:")[1],
             ));
           }
         }
@@ -517,14 +527,15 @@ class NsutApi {
 
             noticesLink.add(NoticeModel(
                 notice: splitNotice[0],
-                publishedBy: "Published By:" + splitNotice[1],
+                publishedBy: splitNotice[1],
                 date: rowChildren[0].text));
           } else {
             noticesLink.add(NoticeModel(
               date: rowChildren[0].text,
               notice: rowChildren[1].children[0].text,
               url: rowChildren[1].children[0].attributes["href"]!,
-              publishedBy: rowChildren[1].children[2].text,
+              publishedBy:
+                  rowChildren[1].children[2].text.split("Published By:")[1],
             ));
           }
         }

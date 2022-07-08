@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:nsutz/controller/studentprofile_controller.dart';
 import 'package:nsutz/theme/constants.dart';
@@ -153,15 +152,7 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
                 ),
               ),
               TextButton(
-                onPressed: () async {
-                  Uri url = Uri.parse(
-                      'https://www.linkedin.com/in/ayush-yadav-6a712421a/');
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url, mode: LaunchMode.externalApplication);
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
+                onPressed: () async => controller.openlinkedinProfile(),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

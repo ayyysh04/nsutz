@@ -6,7 +6,7 @@ import 'package:nsutz/services/session_service.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
 
 class AttendanceSerivce {
-  List<AttendanceModel> attendanceData = [];
+  List<AttendanceModelSubWise> attendanceData = [];
   final SessionSerivce _sessionService = Get.find<SessionSerivce>();
   final StudentProfileSerivce _studentProfileSerivce =
       Get.find<StudentProfileSerivce>();

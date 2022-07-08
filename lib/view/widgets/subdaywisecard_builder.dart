@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 
 import 'package:nsutz/controller/subjectwiseattn_controller.dart';
 import 'package:nsutz/theme/constants.dart';
+import 'package:nsutz/view/widgets/attn_symbols/attn_symbols.dart';
 
 class SubDayCardListBuilder extends GetView<SubjectWiseAttnController> {
   const SubDayCardListBuilder({Key? key}) : super(key: key);
@@ -26,11 +27,13 @@ class SubDayCardListBuilder extends GetView<SubjectWiseAttnController> {
                   verticalOffset: 80.0,
                   child: FadeInAnimation(
                       child: SubDayCard(
+                    tooltipMsg: controller.getTooltipMsg(
+                        controller.subAttnData.details![itemNo].values.first),
                     ispresent: controller.getIsPresent(
                         controller.subAttnData.details![itemNo].values.first),
                     date: controller.subAttnData.details![itemNo].keys.first,
-                    attnMarkString:
-                        controller.subAttnData.details![itemNo].values.first,
+                    attnMarkWidget: controller.getAttendanceIcon(
+                        controller.subAttnData.details![itemNo].values.first),
                   ))));
         },
       ),
@@ -41,13 +44,15 @@ class SubDayCardListBuilder extends GetView<SubjectWiseAttnController> {
 class SubDayCard extends StatelessWidget {
   const SubDayCard({
     Key? key,
+    required this.tooltipMsg,
     required this.ispresent,
     required this.date,
-    required this.attnMarkString,
+    required this.attnMarkWidget,
   }) : super(key: key);
+  final String tooltipMsg;
   final bool? ispresent;
   final String date;
-  final String attnMarkString;
+  final dynamic attnMarkWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -55,16 +60,16 @@ class SubDayCard extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 15.h),
         color: kCardbackgroundcolor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.w),
+          borderRadius: BorderRadius.circular(60.w),
         ),
         elevation: 6.0,
         child: Tooltip(
-          message: '{$date} Attendance',
+          message: tooltipMsg,
           child: Container(
             // height: 180.h,
             padding: EdgeInsets.symmetric(
               horizontal: 65.w,
-              vertical: 40.h,
+              vertical: 35.h,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,34 +81,7 @@ class SubDayCard extends StatelessWidget {
                     fontSize: 50.sp,
                   ),
                 ),
-                Row(
-                  children: [
-                    (ispresent == null)
-                        ? Icon(
-                            Icons.dnd_forwardslash,
-                            color: kLightgreen,
-                            size: 100.w,
-                          )
-                        : (ispresent == true)
-                            ? Icon(
-                                Icons.check,
-                                color: kLightgreen,
-                                size: 100.w,
-                              )
-                            : Icon(
-                                Icons.close,
-                                color: kLightred,
-                                size: 100.w,
-                              ),
-                    Text(
-                      attnMarkString,
-                      style: TextStyle(
-                        fontFamily: 'Questrial',
-                        fontSize: 50.sp,
-                      ),
-                    ),
-                  ],
-                ),
+                attnMarkWidget,
               ],
             ),
           ),

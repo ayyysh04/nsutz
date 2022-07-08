@@ -1,4 +1,4 @@
-class AttendanceModel {
+class AttendanceModelSubWise {
   String? subjectCode;
   String? overallPresent;
   String? overallAbsent;
@@ -7,7 +7,7 @@ class AttendanceModel {
   String? subjectName;
 
   List<Map<String, String>>? details;
-  AttendanceModel({
+  AttendanceModelSubWise({
     this.subjectName,
     this.subjectCode,
     this.overallPresent,
