@@ -28,7 +28,13 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0.0,
-        title: Text('Profile'),
+        title: Text(
+          'Profile',
+          style: TextStyle(
+            fontFamily: 'Questrial',
+            fontSize: 60.sp,
+          ),
+        ),
       ),
       body: SafeArea(
         child: Container(
@@ -49,105 +55,101 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
               ),
               Expanded(
                 flex: 4,
-                child: Container(
+                child: ListView(
+                  controller: ScrollController(keepScrollOffset: false),
+                  physics: BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: 40.w),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      UserCards(
-                        icon: Icons.perm_identity,
-                        name: controller.studentProfileData.studentName,
-                        colour: kLightgreen,
-                      ),
-                      UserCards(
-                        icon: Icons.verified_user,
-                        name: controller.studentProfileData.studentID,
-                        colour: kLightYellow,
-                      ),
-                      UserCards(
-                        icon: Icons.school,
-                        name: controller.studentProfileData.studentDegree,
-                        colour: kLightred,
-                      ),
-                      UserCards(
-                        icon: Icons.menu_book,
-                        name:
-                            "${controller.studentProfileData.studentCurrentSemester!}${getth(controller.studentProfileData.studentCurrentSemester!)} Semester",
-                        colour: Colors.white70,
-                      ),
-                      UserCards(
-                        icon: Icons.menu_book,
-                        name: controller.studentProfileData.studentBranchName,
-                        colour: kLightYellow,
-                      ),
-                      SizedBox(
-                        height: 100.h,
-                      ),
-                      Flexible(
-                        child: MaterialButton(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 30.h, horizontal: 100.w),
-                            child: Text(
-                              'Log Out',
-                              style: TextStyle(
-                                color: kLightred,
-                                fontFamily: 'Questrial',
-                                fontSize: 50.sp,
-                              ),
-                            ),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.0),
-                                border:
-                                    Border.all(color: kLightred, width: 2.0)),
+                  children: [
+                    UserCards(
+                      icon: Icons.perm_identity,
+                      name: controller.studentProfileData.studentName,
+                      colour: kLightgreen,
+                    ),
+                    UserCards(
+                      icon: Icons.verified_user,
+                      name: controller.studentProfileData.studentID,
+                      colour: kLightYellow,
+                    ),
+                    UserCards(
+                      icon: Icons.school,
+                      name: controller.studentProfileData.studentDegree,
+                      colour: kLightred,
+                    ),
+                    UserCards(
+                      icon: Icons.menu_book,
+                      name:
+                          "${controller.studentProfileData.studentCurrentSemester!}${getth(controller.studentProfileData.studentCurrentSemester!)} Semester",
+                      colour: Colors.white70,
+                    ),
+                    UserCards(
+                      icon: Icons.menu_book,
+                      name: controller.studentProfileData.studentBranchName,
+                      colour: kLightYellow,
+                    ),
+                    SizedBox(
+                      height: 100.h,
+                    ),
+                    MaterialButton(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 30.h, horizontal: 100.w),
+                        child: Text(
+                          'Log Out',
+                          style: TextStyle(
+                            color: kLightred,
+                            fontFamily: 'Questrial',
+                            fontSize: 50.sp,
                           ),
-                          onPressed: () async {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: kBackgroundcolor,
-                                    title: Text(
-                                      "Logout of App?",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    content: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary: kLightblue,
-                                          ),
-                                          child: Text(
-                                            "Cancel",
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        SizedBox(
-                                          width: 30.0,
-                                        ),
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              primary: kLightblue),
-                                          child: Text("LogOut"),
-                                          onPressed: () async {
-                                            await controller.logout();
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                });
-                          },
-                          splashColor: Color(0x50FF606F),
                         ),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0),
+                            border: Border.all(color: kLightred, width: 2.0)),
                       ),
-                    ],
-                  ),
+                      onPressed: () async {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: kBackgroundcolor,
+                                title: Text(
+                                  "Logout of App?",
+                                  textAlign: TextAlign.center,
+                                ),
+                                content: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        primary: kLightblue,
+                                      ),
+                                      child: Text(
+                                        "Cancel",
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    SizedBox(
+                                      width: 30.0,
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          primary: kLightblue),
+                                      child: Text("LogOut"),
+                                      onPressed: () async {
+                                        await controller.logout();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            });
+                      },
+                      splashColor: Color(0x50FF606F),
+                    ),
+                  ],
                 ),
               ),
               TextButton(
@@ -170,15 +172,13 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
                     SizedBox(
                       width: 20.w,
                     ),
-                    Flexible(
-                      child: Text(
-                        'Developed by Ayush Yadav',
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          fontFamily: 'Questrial',
-                          color: kLightYellow,
-                          fontSize: 50.sp,
-                        ),
+                    Text(
+                      'Developed by Ayush Yadav',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontFamily: 'Questrial',
+                        color: kLightYellow,
+                        fontSize: 50.sp,
                       ),
                     ),
                   ],
@@ -207,7 +207,7 @@ class UserCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 20.h),
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 40.w),
       child: Row(
         children: [
           Icon(

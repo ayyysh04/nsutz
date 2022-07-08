@@ -15,7 +15,13 @@ class NoticeView extends GetView<NoticeController> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0.0,
-        title: Text("Notice and Circulars"),
+        title: Text(
+          "Notice and Circulars",
+          style: TextStyle(
+            fontFamily: 'Questrial',
+            fontSize: 60.sp,
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20.0),

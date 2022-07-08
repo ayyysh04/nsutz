@@ -32,6 +32,13 @@ class SessionSerivce {
     return res.data!['captcha'];
   }
 
+  Future<String?> reloadCaptcha() async {
+    var res = await _nsutApi.reloadCaptcha(sessionData.cookie!);
+    if (res.error != null || res.data == null) return res.error;
+
+    return res.data;
+  }
+
   Future<String?> login(
       {String? rollno, String? password, required String captcha}) async {
     if (rollno == null && password == null) //captcha login
@@ -96,7 +103,7 @@ class SessionSerivce {
           //removed expired data
           _sharedPrefsService.cookie = null;
           _sharedPrefsService.plumUrl = null;
-
+          await startSessionService();
           return false;
         } else {
           sessionData.plumUrl = res.data!["plumUrl"];

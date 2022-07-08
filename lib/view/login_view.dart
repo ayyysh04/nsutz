@@ -9,7 +9,7 @@ import 'package:nsutz/view/widgets/login_text_form.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({Key? key}) : super(key: key);
-
+//TODO: improve login page for responsivnes ,refer flutterfore login page with size resizable and debig on redmi note 4
   @override
   Widget build(BuildContext context) {
     return GetBuilder<LoginController>(
@@ -55,8 +55,9 @@ class LoginView extends StatelessWidget {
                     title: Text(
                       'NSUT Attendance',
                       style: TextStyle(
-                        color: Colors.white,
                         fontFamily: 'Questrial',
+                        fontSize: 60.sp,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -268,191 +269,7 @@ class LoginView extends StatelessWidget {
                                     )),
                               )
                             ])),
-                  )
-                  // SafeArea(
-                  //   child: Container(
-                  //       padding: EdgeInsets.symmetric(
-                  //           horizontal: 70.w
-                  //           ) //full view padding
-                  //       ,
-                  //       child: Stack(
-                  //         alignment: Alignment.topCenter,
-                  //         fit: StackFit.expand,
-                  //         children: [
-                  //           Column(
-                  //               mainAxisSize: MainAxisSize.max,
-                  //               mainAxisAlignment: MainAxisAlignment.center,
-                  //               crossAxisAlignment: CrossAxisAlignment.center,
-                  //               children: [
-                  //                 CircleAvatar(
-                  //                     backgroundColor: Colors.transparent,
-                  //                     radius: 200.w,
-                  //                     backgroundImage:
-                  //                         AssetImage('images/nsut_logo.png')),
-                  //                 SizedBox(
-                  //                   height: 20.h,
-                  //                 ),
-                  //                 Text('UMS',
-                  //                     style: TextStyle(
-                  //                       // fontWeight: FontWeight.bold,
-                  //                       fontFamily: 'Questrial',
-                  //                       letterSpacing: 2.0,
-                  //                       fontWeight: FontWeight.bold,
-                  //                       fontSize: 100.sp,
-                  //                     )),
-                  //               ]),
-                  //           Positioned(
-                  //             bottom: 5,
-                  //             child: Expanded(
-                  //               child: LoginTextFormField(
-                  //                 isObscureText: false,
-                  //                 keyboardType: TextInputType.text,
-                  //                 isEnable:
-                  //                     true, //true:makes keyboard cursor and soft keyboard  enable
-                  //                 prefix: Icons.perm_identity_rounded,
-                  //                 controller: controller.rollNoController,
-                  //                 validator: (value) {
-                  //                   if (value == null || value.isEmpty) {
-                  //                     return 'Roll no is required!';
-                  //                   }
-                  //                   if (value.length < 11) {
-                  //                     return 'Invalid Roll No';
-                  //                   }
-                  //                   return null;
-                  //                 },
-                  //                 labelText: "NSUT ROLL NO",
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           // SizedBox(
-                  //           //   height: 30.h,
-                  //           // ),
-                  //           Expanded(
-                  //             child: LoginTextFormField(
-                  //               isObscureText: true,
-                  //               keyboardType: TextInputType.text,
-                  //               isEnable: true,
-                  //               prefix: Icons.password,
-                  //               controller: controller.passController,
-                  //               validator: (value) {
-                  //                 if (value == null || value.isEmpty) {
-                  //                   return 'Password is required!';
-                  //                 }
-                  //                 return null;
-                  //               },
-                  //               labelText: 'PASSWORD',
-                  //             ),
-                  //           ),
-                  //           // Column(
-                  //           //   children: [
-                  //           //     SizedBox(
-                  //           //       height: 20.h,
-                  //           //     ),
-                  //           //     FutureBuilder<String?>(
-                  //           //         future: controller.getCaptcha(),
-                  //           //         builder: ((context, snapshot) {
-                  //           //           if (!snapshot.hasData ||
-                  //           //               snapshot.data == null) {
-                  //           //             return CircularProgressIndicator();
-                  //           //           }
-                  //           //           return Row(
-                  //           //             mainAxisAlignment:
-                  //           //                 MainAxisAlignment.center,
-                  //           //             children: [
-                  //           //               CachedNetworkImage(
-                  //           //                 height: 150.h,
-                  //           //                 width: 320.w,
-                  //           //                 fit: BoxFit.contain,
-                  //           //                 imageUrl: snapshot.data!,
-                  //           //                 httpHeaders: const {
-                  //           //                   "Referer":
-                  //           //                       "https://www.imsnsit.org/imsnsit/student.php",
-                  //           //                   "User-Agent":
-                  //           //                       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
-                  //           //                   "Host": "imsnsit.org",
-                  //           //                 },
-                  //           //               ),
-                  //           //               SizedBox(
-                  //           //                 width: 20.w,
-                  //           //               ),
-                  //           //               GestureDetector(
-                  //           //                 onTap: controller.reloadCaptcha,
-                  //           //                 child: Icon(
-                  //           //                   Icons.refresh,
-                  //           //                   size: 100.w,
-                  //           //                 ),
-                  //           //               ),
-                  //           //             ],
-                  //           //           );
-                  //           //         })),
-                  //           // SizedBox(
-                  //           //   height: 20.h,
-                  //           // ),
-                  //           // LoginTextFormField(
-                  //           //   isObscureText: false,
-                  //           //   prefix: Icons.password,
-                  //           //   controller: controller.captchaController,
-                  //           //   labelText: 'CAPTCHA',
-                  //           //   validator: (value) {
-                  //           //     if (value == null || value.isEmpty) {
-                  //           //       return 'Captcha is required!';
-                  //           //     } else if (value.length != 5) {
-                  //           //       return 'Invalid Captcha';
-                  //           //     }
-                  //           //     return null;
-                  //           //   },
-                  //           //   isEnable: true,
-                  //           //   keyboardType: TextInputType.number,
-                  //           // ),
-                  //           // SizedBox(
-                  //           //   height: 20.h,
-                  //           // ),
-                  //           // TextButton(
-                  //           //   onPressed: () {},
-                  //           //   child: Text(
-                  //           //     'Forget Password?',
-                  //           //     style: TextStyle(
-                  //           //         color: Colors.grey.shade500,
-                  //           //         fontFamily: 'Questrial',
-                  //           //         fontSize: 50.sp),
-                  //           //   ),
-                  //           // ),
-                  //           //   ],
-                  //           // ),
-                  //           Text(controller.msg ?? '',
-                  //               style: TextStyle(
-                  //                 color: Colors.red,
-                  //                 fontWeight: FontWeight.bold,
-                  //                 fontSize: 55.sp,
-                  //               )),
-                  //           SizedBox(
-                  //             height: 30.h,
-                  //           ),
-                  //           // ElevatedButton(
-                  //           //     style: ElevatedButton.styleFrom(
-                  //           //       primary: kLightgreen,
-                  //           //     ),
-                  //           //     onPressed: () {
-                  //           //       if (controller.formKey.currentState!
-                  //           //           .validate()) {
-                  //           //         controller.login();
-                  //           //       }
-                  //           //     },
-                  //           //     child: Padding(
-                  //           //       padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  //           //       child: Text(
-                  //           //         'Login',
-                  //           //         style: TextStyle(
-                  //           //             color: Colors.black,
-                  //           //             fontFamily: 'Questrial',
-                  //           //             fontSize: 50.sp,
-                  //           //             fontWeight: FontWeight.bold),
-                  //           //       ),
-                  //           //     )),
-                  //         ],
-                  //       )),
-                  // ),
-                  ),
+                  )),
             ),
           );
         });

@@ -1,4 +1,3 @@
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:nsutz/routes/routes_const.dart';
 import 'package:nsutz/services/session_service.dart';
@@ -6,6 +5,12 @@ import 'package:nsutz/services/shared_pref.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
 
 class SplashController extends GetxController {
+  // @override
+  // void onInit() {
+  //   FlutterNativeSplash.remove();
+  //   super.onInit();
+  // }
+
   final SharedPrefs _sharedPrefsService = Get.find<SharedPrefs>();
   final SessionSerivce _sessionSerivce = Get.find<SessionSerivce>();
   final StudentProfileSerivce _studentProfileSerivce =
@@ -27,6 +32,5 @@ class SplashController extends GetxController {
     } else {
       Get.offNamed(Routes.LOGIN);
     }
-    FlutterNativeSplash.remove();
   }
 }

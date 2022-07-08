@@ -50,3 +50,13 @@ String? getMonthName(String enncodedDate) {
 
   return month;
 }
+
+//-------------DATEWISE MODEL-------------
+class AttendanceModelDateWise {
+  String date;
+  List<Map<String, String>> subData;
+  AttendanceModelDateWise({
+    required this.date,
+    required this.subData,
+  });
+}

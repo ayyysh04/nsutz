@@ -9,7 +9,6 @@ import 'package:nsutz/controller/splash_controller.dart';
 import 'package:nsutz/controller/studentprofile_controller.dart';
 import 'package:nsutz/controller/subjectwiseattn_controller.dart';
 import 'package:nsutz/services/attendance_service.dart';
-import 'package:nsutz/services/creditional_service.dart';
 import 'package:nsutz/services/nsutapi.dart';
 import 'package:nsutz/services/session_service.dart';
 import 'package:nsutz/services/shared_pref.dart';

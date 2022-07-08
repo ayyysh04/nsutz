@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -34,7 +32,13 @@ class PDFViewer extends StatelessWidget {
         }),
       ),
       appBar: AppBar(
-        title: Text(notice),
+        title: Text(
+          notice,
+          style: TextStyle(
+            fontFamily: 'Questrial',
+            fontSize: 60.sp,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),

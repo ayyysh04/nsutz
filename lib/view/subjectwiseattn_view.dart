@@ -25,8 +25,8 @@ class SubjectWiseAttnView extends GetView<SubjectWiseAttnController> {
         title: Text(
           subjectCode,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
             fontFamily: 'Questrial',
+            fontSize: 60.sp,
           ),
         ),
         actions: [

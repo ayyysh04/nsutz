@@ -5,11 +5,10 @@ import 'package:nsutz/controller/datewiseattn_controller.dart';
 import 'package:nsutz/theme/constants.dart';
 
 class SubAttnCard extends GetView<DatewiseAttnController> {
-  const SubAttnCard(
-      {Key? key, required this.subDateAttnData, required this.date})
+  const SubAttnCard({Key? key, required this.date, required this.subData})
       : super(key: key);
-  final List<String> subDateAttnData;
   final String date;
+  final List<Map<String, String>> subData;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -35,22 +34,24 @@ class SubAttnCard extends GetView<DatewiseAttnController> {
                   fontSize: 50.sp),
             ),
             //attendance body
-            subjectHeadingBuilder(subDateAttnData)
+            subjectHeadingBuilder()
           ],
         ),
       ),
     );
   }
 
-  Widget subjectHeadingBuilder(List allSubAttn) {
+  Widget subjectHeadingBuilder() {
     return ListView.builder(
         shrinkWrap: true,
-        itemCount: allSubAttn.length,
+        itemCount: subData.length, //no of subjects
         padding: EdgeInsets.symmetric(vertical: 25.h),
         physics: NeverScrollableScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
-          String heading = controller.subjects[index];
-          String value = allSubAttn[index];
+          String heading = subData[index].keys.first;
+
+          String value = subData[index].values.first;
+
           return Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
             child: Row(

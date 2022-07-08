@@ -20,12 +20,12 @@ class CaptchaView extends GetView<CaptchaController> {
               backgroundColor: Color(0xFF212D49),
               body: Center(
                   child: Wrap(
-                children: const [
+                children: [
                   Center(
                       child: Text(
                     'Logging you in...',
                     style: TextStyle(
-                        fontSize: 20.0,
+                        fontSize: 60.sp,
                         fontFamily: 'Questrial',
                         fontWeight: FontWeight.bold),
                   )),
@@ -58,6 +58,7 @@ class CaptchaView extends GetView<CaptchaController> {
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'Questrial',
+                      fontSize: 60.sp,
                     ),
                     //TODO: logout button
                   ),
@@ -82,7 +83,9 @@ class CaptchaView extends GetView<CaptchaController> {
                         ),
                         Text('IMS',
                             style: TextStyle(
-                              // fontWeight: FontWeight.bold,
+                              fontFamily: 'Questrial',
+                              letterSpacing: 2.0,
+                              fontWeight: FontWeight.bold,
                               fontSize: 100.sp,
                             )),
                         Spacer(
@@ -98,20 +101,37 @@ class CaptchaView extends GetView<CaptchaController> {
                                       snapshot.data == null) {
                                     return CircularProgressIndicator();
                                   }
-
-                                  return CachedNetworkImage(
-                                    imageUrl: snapshot.data!,
-                                    httpHeaders: const {
-                                      "Referer":
-                                          "https://www.imsnsit.org/imsnsit/student.php",
-                                      "User-Agent":
-                                          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
-                                      "Host": "imsnsit.org",
-                                    },
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CachedNetworkImage(
+                                        height: 150.h,
+                                        width: 320.w,
+                                        fit: BoxFit.contain,
+                                        imageUrl: snapshot.data!,
+                                        httpHeaders: const {
+                                          "Referer":
+                                              "https://www.imsnsit.org/imsnsit/student.php",
+                                          "User-Agent":
+                                              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
+                                          "Host": "imsnsit.org",
+                                        },
+                                      ),
+                                      SizedBox(
+                                        width: 20.w,
+                                      ),
+                                      GestureDetector(
+                                        onTap: controller.reloadCaptcha,
+                                        child: Icon(
+                                          Icons.refresh,
+                                          size: 100.w,
+                                        ),
+                                      ),
+                                    ],
                                   );
                                 })),
                             SizedBox(
-                              height: 30,
+                              height: 30.h,
                             ),
                             LoginTextFormField(
                               isObscureText: false,

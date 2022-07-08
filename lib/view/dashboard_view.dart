@@ -17,7 +17,13 @@ class DashboardView extends GetView<DashboardController> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0.0,
-        title: Text("Dashboard"),
+        title: Text(
+          "Dashboard",
+          style: TextStyle(
+            fontFamily: 'Questrial',
+            fontSize: 60.sp,
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20.0),
@@ -178,7 +184,8 @@ class DashboardView extends GetView<DashboardController> {
                 }),
               ),
               SizedBox(
-                height: 20.0,
+                //TODO:check all sizes are according ti flutter util or not
+                height: 20.h,
               ),
               //Data wise attendance button
               Center(

@@ -20,11 +20,6 @@ class LoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Text('Attendance'),
-      ),
       body: FutureBuilder<bool?>(
           future: load(),
           builder: (context, snapshot) {
@@ -52,6 +47,7 @@ class LoadingView extends StatelessWidget {
                         flex: 3,
                         child: Container(
                           child: Center(
+                            //TODO:loading page not in use ,remove it or use it
                             child: Text(
                               'Fetching Attendance form Accsoft...',
                               maxLines: 1,

@@ -30,8 +30,10 @@ class SubjectsCard extends StatelessWidget {
       child: Tooltip(
         message: '{$subject} Attendance',
         child: Container(
-          height: 340.h,
+          // height: 340.h,
+          // margin: EdgeInsets.symmetric(vertical: 10.w),
           padding: EdgeInsets.symmetric(
+            vertical: 65.h,
             horizontal: 65.w,
           ),
           child: Column(
@@ -111,39 +113,25 @@ class SubjectsCard extends StatelessWidget {
 
   String getMsg(double percent, int overallClasses, int presentClasses) {
     int count = 0;
-    var tempPer = percent;
-    var tempOverallClasses = overallClasses;
-    //to take leave
-    while ((tempPer > 75)) {
-      tempOverallClasses = tempOverallClasses + 1;
-      tempPer = (presentClasses / tempOverallClasses) * 100;
-      if (tempPer >= 75)
-        count++;
-      else
-        break;
-    }
-    tempPer = percent;
-    tempOverallClasses = overallClasses;
-    //to get 75
-    while ((tempPer < 75)) {
-      tempOverallClasses = tempOverallClasses + 1;
-      presentClasses = presentClasses + 1;
-      tempPer = (presentClasses / tempOverallClasses) * 100;
-      if (tempPer < 75)
-        count++;
-      else
-        break;
+
+    if ((percent > 75)) //to take leave
+    {
+      count = ((presentClasses / 0.75) - overallClasses).floor();
+    } else if ((percent < 75)) //to get 75
+    {
+      count = (((overallClasses * 0.75) - presentClasses) / 0.25).floor();
     }
 
-    if (percent == 0) return "classes not started yet!";
-    if (percent >= 75.0) {
+    if (percent == 75) {
+      return "Safe! You cannot take a leave right now";
+    } else if (percent > 75.0) {
       return "Safe! You can take leave for $count classes";
+    } else if (percent >= 55.0) {
+      return "Unsafe! Attend $count class to enter green zone";
+    } else if (percent > 0) {
+      return "Too low attendance! Attend $count class to enter green zone";
     } else {
-      if (percent >= 55.0) {
-        return "Unsafe! Attend $count class to enter green zone";
-      } else {
-        return "Too low attendance! Attend $count class to enter green zone";
-      }
+      return "classes not started yet!";
     }
   }
 }

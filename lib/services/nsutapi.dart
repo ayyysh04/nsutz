@@ -3,14 +3,13 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart' as d;
 import 'package:html/parser.dart' as parser;
+import 'package:intl/intl.dart';
+
 import 'package:nsutz/model/attendance_model.dart';
 import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/model/notice_model.dart';
 import 'package:nsutz/model/student_model.dart';
-import 'package:intl/intl.dart';
-import 'package:nsutz/services/session_service.dart';
 
 class NsutApi {
   var dio = Dio();
@@ -80,31 +79,37 @@ class NsutApi {
       }
       return CustomResponse(data: ret);
     } on DioError catch (e) {
+      //TODO:Test app without internet and fix this exception accordingly
       debugPrint("Network Error" + e.response!.statusCode.toString());
       return CustomResponse(error: "Network Error");
       // if (e.response?.statusCode == 302) {}
     }
   }
 
-  Future<CustomResponse<Map<String, String>>>
-      reloadCaptcha() async //TODO:implement this
+  Future<CustomResponse<String>> reloadCaptcha(
+      String cookie) async //TODO:implement this
   {
     try {
       dio.options.headers.addAll({
         "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
+        "Cookie": cookie
       });
 
       var resStr =
           await dio.get("/imsnsit/plum5_fw_utils.php?rty=captcha&typ=login");
+
       var document = parser.parse(resStr.data);
-      Map<String, String> ret = {};
       // ret["hrand"] = //hrand will be same
       String? imgCaptcha =
           document.getElementById("captchaimg")?.attributes["src"];
-      if (imgCaptcha != null) {
-        ret["captcha"] = "https://imsnsit.org/imsnsit/" + imgCaptcha;
+      if (imgCaptcha == null) {
+        throw DioError(
+            requestOptions: RequestOptions(path: ""),
+            response: Response(requestOptions: RequestOptions(path: "")));
       }
-      return CustomResponse(data: ret);
+      String imgLink = "https://imsnsit.org/imsnsit/" + imgCaptcha;
+
+      return CustomResponse(data: imgLink);
     } on DioError catch (e) {
       debugPrint("Network Error" + e.response!.statusCode.toString());
       return CustomResponse(error: "Network Error");
@@ -135,7 +140,7 @@ class NsutApi {
         "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
       });
 
-      var res = await dio.post("/imsnsit/student_login.php", data: data);
+      await dio.post("/imsnsit/student_login.php", data: data);
     } on DioError catch (e) {
       if (e.response?.statusCode == 302) {
         if (e.response?.headers.map["Location"]?[0] != null &&
@@ -387,6 +392,8 @@ class NsutApi {
       return CustomResponse(error: "Network Error");
     }
   }
+
+  //TODO: make a seprate scrape call to get attendance and store in datewise order : THIS WILL INCRESE LOCAL STORAGE USAGE OF THE APP
 
   //TODO:UNDERDEVELOPMENT
   Future<void> getAllTT(String plumUrl, String ttUrl) async {
