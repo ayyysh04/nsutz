@@ -42,14 +42,11 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  radius: 150.w,
+              ClipRRect(
+                  borderRadius: BorderRadius.circular(50.w),
                   child: controller.studentProfileData.studentImage),
-              Container(
-                width: double.infinity,
-                height: 2.0,
-                margin: EdgeInsets.symmetric(vertical: 60.h),
+              Divider(
+                thickness: 2.0,
                 color: kCardbackgroundcolor,
               ),
               Expanded(
@@ -65,25 +62,39 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
                       colour: kLightgreen,
                     ),
                     UserCards(
+                      icon: Icons.cake_rounded,
+                      name: controller.studentProfileData.studentDOB,
+                      colour: kLightgreen,
+                    ),
+                    UserCards(
                       icon: Icons.verified_user,
                       name: controller.studentProfileData.studentID,
-                      colour: kLightYellow,
+                      colour: kLightgreen,
                     ),
                     UserCards(
                       icon: Icons.school,
-                      name: controller.studentProfileData.studentDegree,
-                      colour: kLightred,
+                      name: controller.studentProfileData.studentDegree! +
+                          " - "
+                              "${controller.studentProfileData.studentCurrentSemester!}${getth(controller.studentProfileData.studentCurrentSemester!)} Semester",
+                      colour: kLightgreen,
                     ),
                     UserCards(
                       icon: Icons.menu_book,
-                      name:
-                          "${controller.studentProfileData.studentCurrentSemester!}${getth(controller.studentProfileData.studentCurrentSemester!)} Semester",
-                      colour: Colors.white70,
+                      name: controller.studentProfileData.studentBranchName! +
+                          " - " +
+                          controller.studentProfileData.studentSection!,
+                      colour: kLightgreen,
                     ),
-                    UserCards(
-                      icon: Icons.menu_book,
-                      name: controller.studentProfileData.studentBranchName,
-                      colour: kLightYellow,
+                    Visibility(
+                      visible:
+                          controller.studentProfileData.studentSpecialization !=
+                              controller.studentProfileData.studentBranchName,
+                      child: UserCards(
+                        icon: Icons.menu_book,
+                        name:
+                            controller.studentProfileData.studentSpecialization,
+                        colour: kLightgreen,
+                      ),
                     ),
                     SizedBox(
                       height: 100.h,
@@ -204,7 +215,7 @@ class UserCards extends StatelessWidget {
           Icon(
             icon,
             color: colour,
-            size: 60.sp,
+            size: 70.w,
           ),
           SizedBox(width: 30.w),
           Expanded(

@@ -23,7 +23,8 @@ class SubAttnCard extends GetView<DatewiseAttnController> {
         margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 5.h),
         padding: EdgeInsets.symmetric(vertical: 50.h, horizontal: 10.w),
         child: Column(
-          children: <Widget>[
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
             //Date heading
             Text(
               date,
@@ -58,7 +59,7 @@ class SubAttnCard extends GetView<DatewiseAttnController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  width: 490.w,
+                  width: 600.w,
                   child: Text(
                     heading,
                     softWrap: true,
@@ -70,7 +71,7 @@ class SubAttnCard extends GetView<DatewiseAttnController> {
                   ),
                 ),
                 SizedBox(
-                  width: 390.w,
+                  // width: 390.w,
                   child: Text(
                     value,
                     style: TextStyle(
@@ -79,15 +80,6 @@ class SubAttnCard extends GetView<DatewiseAttnController> {
                     ),
                   ),
                 ),
-                // (value == 'P')
-                //     ? Icon(
-                //         Icons.check,
-                //         color: kLightgreen,
-                //       )
-                //     : Icon(
-                //         Icons.close,
-                //         color: kLightred,
-                //       ),
               ],
             ),
           );
