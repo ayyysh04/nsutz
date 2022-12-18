@@ -7,7 +7,7 @@ import 'package:nsutz/theme/constants.dart';
 class SubAttnCard extends GetView<DatewiseAttnController> {
   const SubAttnCard({Key? key, required this.date, required this.subData})
       : super(key: key);
-  final String date;
+  final DateTime date;
   final List<Map<String, String>> subData;
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class SubAttnCard extends GetView<DatewiseAttnController> {
           children: [
             //Date heading
             Text(
-              date,
+              toStringDate(date),
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Questrial',

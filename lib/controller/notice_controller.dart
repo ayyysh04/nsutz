@@ -23,17 +23,16 @@ class NoticeController extends GetxController {
   String noticeTag = 'noticeTag';
   Future<String> getNotices() async {
     if (notices.isEmpty) {
-      CustomResponse<List<NoticeModel>>? res;
+      CustomResponse<List<NoticeModel>>? noticeRes;
       if (oldNotice == false) {
-        res = await _nsutApi.getNotices();
+        noticeRes = await _nsutApi.getNotices();
       } else {
-        res = await _nsutApi.getOldNotices();
+        noticeRes = await _nsutApi.getOldNotices();
       }
-      if (res.data == null || res.error != null) {
-        return res.error!;
-      } else {
-        notices = res.data!;
+      if (noticeRes.res != Result.success) {
+        return noticeRes.res.toString();
       }
+      notices = noticeRes.data!;
     }
     return "success";
   }
@@ -50,7 +49,7 @@ class NoticeController extends GetxController {
   }
 
   void openNotice(BuildContext context,
-      {required String notice, String? link, required String date}) async {
+      {required String notice, String? link, required DateTime date}) async {
     if (link != null) {
       var headers = {
         "Referer": "https://www.imsnsit.org/imsnsit/",
@@ -96,7 +95,7 @@ class NoticeController extends GetxController {
     searchQuery = text;
     if (searchQuery != '') {
       searchNotices.addAll(notices.where((element) =>
-          element.date.contains(text.toLowerCase()) ||
+          element.date.toString().contains(text.toLowerCase()) ||
           element.publishedBy.toLowerCase().contains(text.toLowerCase()) ||
           element.notice.toLowerCase().contains(text.toLowerCase())));
     }

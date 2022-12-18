@@ -1,13 +1,14 @@
 class Session {
   String? cookie;
+  String? hrand;
+  String? rollNo;
+  String? password;
   String? registration;
   String? dashboard;
   String? activities;
   String? plumUrl;
   String? logout;
-  String? hrand;
-  String? rollNo;
-  String? password;
+
   Session(
       {this.cookie,
       this.registration,

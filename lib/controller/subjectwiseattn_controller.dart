@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:nsutz/model/attendance_model.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/services/attendance_service.dart';
 import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/view/widgets/attn_symbols/attn_symbols.dart';
@@ -22,17 +23,12 @@ class SubjectWiseAttnController extends GetxController {
 
   Future<String> getStudentAttendance(String subjectName) async {
     if (_attendanceSerivce.attendanceData.isEmpty) {
-      var res = await _attendanceSerivce.getAttendanceData();
+      var attnRes = await _attendanceSerivce.getAttendanceData();
 
-      if (res == null) {
-        //TODO:use better return statement for proper management like here using null as success is a bad practice
-        subAttnData = getSubAttnData(subjectName);
-        return "success";
+      if (attnRes != Result.success) {
+        return attnRes.toString();
       }
-
-      return res;
     }
-
     subAttnData = getSubAttnData(subjectName);
     return "success";
   }

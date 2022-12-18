@@ -9,10 +9,7 @@ import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/theme/themes.dart';
 
 void main() {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-
-  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {});
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

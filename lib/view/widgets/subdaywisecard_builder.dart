@@ -1,5 +1,3 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -7,7 +5,6 @@ import 'package:get/get.dart';
 
 import 'package:nsutz/controller/subjectwiseattn_controller.dart';
 import 'package:nsutz/theme/constants.dart';
-import 'package:nsutz/view/widgets/attn_symbols/attn_symbols.dart';
 
 class SubDayCardListBuilder extends GetView<SubjectWiseAttnController> {
   const SubDayCardListBuilder({Key? key}) : super(key: key);
@@ -51,7 +48,7 @@ class SubDayCard extends StatelessWidget {
   }) : super(key: key);
   final String tooltipMsg;
   final bool? ispresent;
-  final String date;
+  final DateTime date;
   final dynamic attnMarkWidget;
 
   @override
@@ -71,11 +68,12 @@ class SubDayCard extends StatelessWidget {
               horizontal: 65.w,
               vertical: 35.h,
             ),
+            //TODO:Divide the list with month name divider
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  date,
+                  toStringDate(date),
                   style: TextStyle(
                     fontFamily: 'Questrial',
                     fontSize: 50.sp,
@@ -89,20 +87,22 @@ class SubDayCard extends StatelessWidget {
   }
 
   Color getcolor(double percent) {
-    if (percent >= 75.0)
+    if (percent >= 75.0) {
       return kLightgreen;
-    else if (percent >= 55.0)
+    } else if (percent >= 55.0) {
       return kLightYellow;
-    else
+    } else {
       return kLightred;
+    }
   }
 
   String getMsg(double percent) {
-    if (percent >= 75.0)
+    if (percent >= 75.0) {
       return "Safe! You can take leave for x classes";
-    else if (percent >= 55.0)
+    } else if (percent >= 55.0) {
       return "Unsafe! Attend x class to enter green zone";
-    else
+    } else {
       return "Too low attendance! Attend x class to enter green zone";
+    }
   }
 }

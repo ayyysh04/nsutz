@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 const kLightgreen = Color(0xFF00E6AD);
 const kLightred = Color(0xFFFF606F);
@@ -45,6 +46,11 @@ final kColumnTextStyleSmall = TextStyle(
   fontSize: 40.sp,
 );
 
+final kColumnTextStyleMedium = TextStyle(
+  fontFamily: 'Questrial',
+  fontSize: 60.sp,
+);
+
 final List shortMonths = [
   ' ',
   'Jan',
@@ -60,3 +66,14 @@ final List shortMonths = [
   'Nov',
   'Dec',
 ];
+
+String toStringDate(DateTime date) //'04 02 2020' to '04 july 2020 \nMonday'
+{
+  DateFormat format = DateFormat("dd MMMM yyyy \nEEEE");
+  return format.format(date);
+}
+
+TextStyle textStyle(context, {double? fontSize, FontWeight? fontWeight}) {
+  return TextStyle(
+      fontFamily: 'Questrial', fontSize: fontSize, fontWeight: fontWeight);
+}

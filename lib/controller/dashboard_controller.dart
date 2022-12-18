@@ -3,6 +3,7 @@
 import 'package:get/get.dart';
 
 import 'package:nsutz/model/attendance_model.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/routes/routes_const.dart';
 import 'package:nsutz/services/attendance_service.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
@@ -40,15 +41,12 @@ class DashboardController extends GetxController {
     update();
   }
 
-  Future<String> getStudentAttendance() async {
+  Future<String?> getStudentAttendance() async {
     if (_attendanceSerivce.attendanceData.isEmpty) {
       var res = await _attendanceSerivce.getAttendanceData();
-
-      if (res == null) {
-        return "success";
+      if (res != Result.success) {
+        return res.toString();
       }
-
-      return res;
     }
     return "success";
   }

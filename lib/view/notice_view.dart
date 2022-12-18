@@ -215,8 +215,9 @@ class NoticeCardListBuilder extends GetView<NoticeController> {
                           ),
                           Text(
                             controller.searchQuery == null
-                                ? controller.notices[itemNo].date
-                                : controller.searchNotices[itemNo].date,
+                                ? toStringDate(controller.notices[itemNo].date)
+                                : toStringDate(
+                                    controller.searchNotices[itemNo].date),
                             style: TextStyle(
                               fontSize: 45.sp,
                               fontFamily: 'Questrial',
@@ -253,7 +254,7 @@ class NoticeCard extends StatelessWidget {
     required this.publishedBy,
   }) : super(key: key);
   final String notice;
-  final String date;
+  final DateTime date;
   final String publishedBy;
 
   @override

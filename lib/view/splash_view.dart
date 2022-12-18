@@ -13,7 +13,7 @@ class SplashView extends GetView<SplashController> {
       child: SafeArea(
           child: Center(
         child: FutureBuilder(
-            future: controller.checkLoginAndNavigate(),
+            future: controller.checkUserDataAndNavigate(),
             builder: ((context, snapshot) => CircularProgressIndicator())),
       )),
     );

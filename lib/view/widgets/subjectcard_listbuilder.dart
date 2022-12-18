@@ -30,8 +30,8 @@ class SubjectCardListBuilder extends GetView<DashboardController> {
             percent: subjectItem.overallPercentage!,
             subject:
                 subjectItem.subjectCode! + " : " + subjectItem.subjectName!,
-            overallClasses: int.parse(subjectItem.overallClasses!),
-            presentClasses: int.parse(subjectItem.overallPresent!),
+            overallClasses: subjectItem.overallClasses!,
+            presentClasses: subjectItem.overallPresent!,
           ),
         );
       },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/routes/routes_const.dart';
 import 'package:nsutz/services/session_service.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
@@ -7,7 +8,7 @@ import 'package:nsutz/services/studentprofile_service.dart';
 class CaptchaController extends GetxController {
   bool? isLoading;
   String? msg;
-  String? captchaLink;
+  Image? captchaImg;
   final formKey = GlobalKey<FormState>();
   TextEditingController captchaController = TextEditingController();
 
@@ -15,19 +16,36 @@ class CaptchaController extends GetxController {
   final StudentProfileSerivce _studentProfileSerivce =
       Get.find<StudentProfileSerivce>();
 
-  Future<String?> getCaptcha() async {
-    captchaLink ??= await _sessionSerivce.getCaptcha();
-    return captchaLink;
+  Future<Image?> getCaptcha() async {
+    // (await _sessionSerivce.getCaptcha())!["captcha"];
+    if (captchaImg == null) {
+      var capRes = await _sessionSerivce.getCaptcha();
+
+      if (capRes.res != Result.success) {
+        return null;
+        // TODO:show snackbar of error
+      }
+
+      captchaImg = Image.memory(capRes.data!.captchaUInt8!);
+
+      //TODO:ML captcha test
+      if (capRes.data!.captchaText != null) {
+        captchaController.text = capRes.data!.captchaText!;
+      }
+    }
+    // login();
+    return captchaImg;
   }
 
   //functions
   Future<void> reloadCaptcha() async {
-    captchaLink = null;
+    captchaImg = null;
     await _sessionSerivce.reloadCaptcha();
     captchaController.clear();
     update();
   }
 
+  // result : success , invalidPassword,invalidCaptcha , NetworkError
   void login() async {
     if (isLoading == true) //no more calls when already loading
     {
@@ -36,23 +54,19 @@ class CaptchaController extends GetxController {
     isLoading = true;
     update();
 
-    // dynamic res = await Provider.of<LoginProvider>(context, listen: false)
-    //     .login(_id.text, password, lnctu);//login http call
+    var loginRes = await _sessionSerivce.login(captcha: captchaController.text);
+    //save login id and pass  and other things in local storage
+    //TODO: NEW UPDATE : How to sync the local stored data with new data : using cachehttpManager
 
-    var res = await _sessionSerivce.login(captcha: captchaController.text);
-
-    //TODO: How to sync the local stored data with new data
-
-    if (res == null) {
-      var res2 = await _studentProfileSerivce.getStudentProfileData();
-      if (res2 == null) {
-        Get.offAllNamed(Routes.DASHBOARD);
-        return;
-      }
+    if (loginRes == Result.success &&
+        await _studentProfileSerivce.getStudentProfileData() ==
+            Result.success) {
+      Get.offNamed(Routes.DASHBOARD);
+    } else {
+      isLoading = false;
+      msg = loginRes.toString();
+      // TODO : testing -> passController.clear();
+      update();
     }
-    isLoading = false;
-    msg = res;
-    captchaController.clear();
-    update();
   }
 }

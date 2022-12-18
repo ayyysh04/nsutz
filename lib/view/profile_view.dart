@@ -63,7 +63,7 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
                     ),
                     UserCards(
                       icon: Icons.cake_rounded,
-                      name: controller.studentProfileData.studentDOB,
+                      name: controller.studentProfileData.studentDOB.toString(),
                       colour: kLightgreen,
                     ),
                     UserCards(

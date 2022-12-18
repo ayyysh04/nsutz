@@ -1,64 +1,78 @@
 //Stores session related data and session fetching services
 
+import 'dart:developer';
+
 import 'package:get/get.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/model/session_model.dart';
 import 'package:nsutz/routes/routes_const.dart';
+import 'package:nsutz/services/ml_service.dart';
 import 'package:nsutz/services/nsutapi.dart';
 import 'package:nsutz/services/shared_pref.dart';
 
 class SessionSerivce {
+//IMP:all session data should be accessed via modelData not by any function return
 //core service
   final NsutApi _nsutApi = Get.find<NsutApi>();
   final SharedPrefs _sharedPrefsService = Get.find<SharedPrefs>();
-
+  final CaptchaMlService _captchaMlService = Get.find<CaptchaMlService>();
 //my services
   Session sessionData = Session();
 
-  Future<String?> startSessionService({String? cookie}) async {
-    var res = await _nsutApi.setCookieAndHeaders(cookie: cookie);
-
-    if (res.error != null || res.data == null) return res.error;
-
-    sessionData.cookie = res.data;
-    return "set";
+  ///result : success , network error
+  Future<Result> startSessionService({String? cookie}) async {
+    var cookieRes = await _nsutApi.setCookieAndHeaders(cookieArg: cookie);
+    sessionData.cookie = cookieRes.data;
+    return cookieRes.res;
   }
 
-  Future<String?> getCaptcha() async {
-    var res = await _nsutApi.getCaptcha();
-    if (res.error != null || res.data == null) return res.error;
+  ///result : NetworkError , success
+  ///
+  ///data : Uint8List? captchaUInt8, String? captchaText
+  Future<CustomResponse<MLCaptchaResponse>> getCaptcha() async {
+    var networdRes = await _nsutApi.getCaptcha();
 
-    sessionData.hrand = res.data!['hrand'];
+    if (networdRes.res != Result.success) {
+      return CustomResponse(res: networdRes.res);
+    }
 
-    return res.data!['captcha'];
+    //call ml service for recognation
+    String? capCode =
+        _captchaMlService.classify(networdRes.data!.captchaUInt8!);
+    //TODO:if ml cannot recog capCode ,show bottombar to manually input the capCode
+
+    sessionData.hrand = networdRes.data!.hrand!;
+    return CustomResponse(
+        res: Result.success,
+        data: MLCaptchaResponse(
+            captchaUInt8: networdRes.data!.captchaUInt8, captchaText: capCode));
   }
 
-  Future<String?> reloadCaptcha() async {
-    var res = await _nsutApi.reloadCaptcha(sessionData.cookie!);
-    if (res.error != null || res.data == null) return res.error;
-
-    return res.data;
+  Future<CustomResponse<CaptchaResponse>> reloadCaptcha() async {
+    return await _nsutApi.reloadCaptcha();
   }
 
-  Future<String?> login(
+  ///result : invalid session ,network error ,success
+  Future<Result> login(
       {String? rollno, String? password, required String captcha}) async {
     if (rollno == null && password == null) //captcha login
     {
       rollno = sessionData.rollNo;
       password = sessionData.password;
     }
-    var res = await _nsutApi.loginAndCheckCaptcha(
+    var loginRes = await _nsutApi.loginAndCheckCaptcha(
         rollno!, password!, captcha, sessionData.hrand!);
-    if (res.error != null || res.data == null) //retry
+    if (loginRes.res != Result.success) //retry
     {
-      return res.error;
+      return loginRes.res;
     }
 
     //saving in session model
-    sessionData.dashboard = res.data!["dashboard"]!;
-    sessionData.activities = res.data!["activities"]!;
-    sessionData.registration = res.data!["registration"]!;
-    sessionData.logout = res.data!["logout"]!;
-    sessionData.plumUrl = res.data!["plumUrl"]!;
+    sessionData.dashboard = loginRes.data!.dashboard;
+    sessionData.activities = loginRes.data!.activities;
+    sessionData.registration = loginRes.data!.registration;
+    sessionData.logout = loginRes.data!.logout;
+    sessionData.plumUrl = loginRes.data!.plumUrl;
 
     sessionData.rollNo = rollno;
     sessionData.password = password;
@@ -69,59 +83,60 @@ class SessionSerivce {
     _sharedPrefsService.password = password;
     _sharedPrefsService.cookie = sessionData.cookie;
     _sharedPrefsService.plumUrl = sessionData.plumUrl;
-
-    return null;
+    return Result.success;
   }
 
-  Future<bool?> resumeLogin() async {
-    /*
-    null->relogin using id and pass
-    true->resume success
-    false->relogin using captcha
-    */
+  ///start session and check if login is resuable or not -> if yes then loads the ims urls (dashboard ,profile ,etc)
+  ///
+  ///result : success , network error , invalidData , invalid session
+  Future<Result> startSessionAndCheckLogin() async {
     var cookie = _sharedPrefsService.cookie;
     var plumUrl = _sharedPrefsService.plumUrl;
     var rollNo = _sharedPrefsService.rollNo;
     var password = _sharedPrefsService.password;
+
+    // cookie = null; //TODO:only for captcha testing
+    // rollNo = "2021UIT3132";
+    // password = "Pankaj#1974";
+
     // print(isLogin);
     // print(cookie);
     // print(plumUrl);
+
     if (rollNo != null && password != null) //already login
     {
       sessionData.rollNo = _sharedPrefsService.rollNo;
       sessionData.password = _sharedPrefsService.password;
       if (cookie != null && plumUrl != null) //restore login session
       {
-        await startSessionService(cookie: cookie); //set stored cookie
+        await startSessionService(
+            cookie:
+                cookie); //set stored cookie : no need to check result as this is only seting prev cookie
 
-        var res = await _nsutApi
+        var stuImsres = await _nsutApi
             .getStudentImsUrls(plumUrl); //get the profile Ims links
 
-        if (res.error != null ||
-            res.data == null) //session expired !relogin using new captcha
+        if (stuImsres.res == Result.success) {
+          sessionData.plumUrl = stuImsres.data!.plumUrl;
+          sessionData.dashboard = stuImsres.data!.dashboard;
+          sessionData.activities = stuImsres.data!.activities;
+          sessionData.registration = stuImsres.data!.registration;
+          sessionData.logout = stuImsres.data!.logout;
+          return Result.success; //login successfull
+        } else if (stuImsres.res ==
+            Result.invalidSession) //session expired !relogin using new captcha
         {
           //removed expired data
           _sharedPrefsService.cookie = null;
           _sharedPrefsService.plumUrl = null;
-          await startSessionService();
-          return false;
+          return await startSessionService();
         } else {
-          sessionData.plumUrl = res.data!["plumUrl"];
-          sessionData.dashboard = res.data!["dashboard"];
-          sessionData.activities = res.data!["activities"];
-          sessionData.registration = res.data!["registration"];
-          sessionData.logout = res.data!["logout"];
-          return true; //login successfull
+          return Result.networkError;
         }
-      } else //no prev session,start a new one with saved roll no and captcha
-      {
-        await startSessionService();
-        return false;
       }
     }
-    //else no prev data login -> relogin
     await startSessionService();
-    return null;
+    return Result.invalidData; //no prev login -> go to login screen
   }
 
   void logOut() async {

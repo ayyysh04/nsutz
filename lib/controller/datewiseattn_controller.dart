@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:nsutz/model/attendance_model.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/services/attendance_service.dart';
 import 'package:nsutz/theme/constants.dart';
 
@@ -43,11 +44,9 @@ class DatewiseAttnController extends GetxController {
       var res = await _attendanceSerivce.getAttendanceData();
 
       setDateWiseAttn();
-      if (res == null) {
-        return "success";
+      if (res != Result.success) {
+        return res.toString();
       }
-
-      return res;
     }
     return "success";
   }
@@ -59,6 +58,7 @@ class DatewiseAttnController extends GetxController {
     isSearchOn = true;
     searchAttnData = [];
     //converting system date format to database format date
+    //TODO:update all this logic to normal as database format is fixed now
     String month = shortMonths[date.month];
     int currdate = date.day;
     String day = (currdate < 10)
@@ -71,7 +71,7 @@ class DatewiseAttnController extends GetxController {
     //finding date in attnData
 
     for (var i in datewiseAttnData) {
-      if (i.date == finalDate) {
+      if (i.date == date) {
         searchAttnData.add(i);
         break;
       }

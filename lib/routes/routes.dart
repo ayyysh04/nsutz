@@ -43,11 +43,6 @@ class RoutePages {
       binding: StudentProfileBinding(),
     ),
     GetPage(
-      name: Routes.LOADING,
-      page: () => LoadingView(),
-      binding: LoadingBinding(),
-    ),
-    GetPage(
       name: Routes.NOTICE,
       page: () => NoticeView(),
       binding: NoticeBinding(),

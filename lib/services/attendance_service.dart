@@ -1,11 +1,13 @@
 //Stores attendance related data and attendance fetching services
 import 'package:get/get.dart';
 import 'package:nsutz/model/attendance_model.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/services/nsutapi.dart';
 import 'package:nsutz/services/session_service.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
 
 class AttendanceSerivce {
+  //all the attendance data will be accessed using attendance model not by function returns
   List<AttendanceModelSubWise> attendanceData = [];
   final SessionSerivce _sessionService = Get.find<SessionSerivce>();
   final StudentProfileSerivce _studentProfileSerivce =
@@ -14,21 +16,21 @@ class AttendanceSerivce {
 //api service
   final NsutApi _nsutApi = Get.find<NsutApi>();
 
-  Future<String?> getAttendanceData() async {
-    var res = await _nsutApi.getAttendanceData(
+  ///Result : invalidSession ,networkError,Success
+  Future<Result> getAttendanceData() async {
+    var attnRes = await _nsutApi.getAttendanceData(
         _sessionService.sessionData.activities!,
         _studentProfileSerivce.studentData.studentID!,
         _studentProfileSerivce.studentData.studentDegree!,
         _studentProfileSerivce.studentData.studentDegree!);
+    //TODO: here branch name is given as degree cross check IMP
 
-    if (res.error != null || res.data == null) return res.error;
+    if (attnRes.res != Result.success) return attnRes.res;
 
-    String semNo = res.data!["semNo"];
     _studentProfileSerivce.studentData.studentCurrentSemester =
-        int.parse(semNo);
-
-    attendanceData = res.data!["attnData"];
-    return null;
+        attnRes.data!.semesterNo!;
+    attendanceData = attnRes.data!.attnData!;
+    return Result.success;
   }
 
   void resetAttenanceData() {

@@ -111,8 +111,9 @@ class LoadingView extends StatelessWidget {
                 baseColor: kCardbackgroundcolor,
                 highlightColor: Color(0xff758AA7),
               );
-            } else
+            } else {
               return Container();
+            }
           }),
     );
   }

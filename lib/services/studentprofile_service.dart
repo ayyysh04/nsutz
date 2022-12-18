@@ -1,5 +1,6 @@
 //Stores profile related data and profile fetching services
 import 'package:get/get.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/model/student_model.dart';
 import 'package:nsutz/services/nsutapi.dart';
 import 'package:nsutz/services/session_service.dart';
@@ -10,15 +11,17 @@ class StudentProfileSerivce {
 
 //api service
   final NsutApi _nsutApi = Get.find<NsutApi>();
-  Future<String?> getStudentProfileData() async {
-    var res = await _nsutApi.getStudentProfile(
+
+  ///result : success , invalidPassword,invalidCaptcha , NetworkError
+  Future<Result> getStudentProfileData() async {
+    var stuProfilefres = await _nsutApi.getStudentProfile(
       _sessionSerivce.sessionData.dashboard!,
     );
 
-    if (res.error != null || res.data == null) return res.error;
-    studentData = res.data!;
+    if (stuProfilefres.res != Result.success) return stuProfilefres.res;
 
-    return null;
+    studentData = stuProfilefres.data!;
+    return Result.success;
   }
 
   void resetProfileData() {

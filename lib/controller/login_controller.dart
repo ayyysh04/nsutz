@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/routes/routes_const.dart';
 import 'package:nsutz/services/session_service.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
 
 class LoginController extends GetxController {
   String? msg;
-  bool showCollegeError = false;
   bool isLoading = false;
-  String? captchaLink;
+  Image? captchaImg;
   FocusNode rollNoFocusNode = FocusNode();
   FocusNode passFocusNode = FocusNode();
   FocusNode captchaNoFocusNode = FocusNode();
   TextEditingController rollNoController =
       TextEditingController(text: "2020UEI2838");
+  //TODO:default values for testing
   TextEditingController passController =
-      TextEditingController(text: "jhjrjn?7");
+      TextEditingController(text: "jhjrjn?7"); //TODO:default values for testing
   TextEditingController captchaController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -24,14 +25,31 @@ class LoginController extends GetxController {
       Get.find<StudentProfileSerivce>();
   final SessionSerivce _sessionSerivce = Get.find<SessionSerivce>();
 
-  Future<String?> getCaptcha() async {
-    captchaLink ??= await _sessionSerivce.getCaptcha();
-    return captchaLink;
+  Future<Image?> getCaptcha() async {
+    // (await _sessionSerivce.getCaptcha())!["captcha"];
+
+    if (captchaImg == null) {
+      var capRes = await _sessionSerivce.getCaptcha();
+
+      if (capRes.res != Result.success) {
+        printError(info: capRes.res.toString());
+        return null;
+        // TODO:show snackbar of error
+      }
+
+      captchaImg = Image.memory(capRes.data!.captchaUInt8!);
+
+      //TODO:ML captcha test
+      if (capRes.data!.captchaText != null) {
+        captchaController.text = capRes.data!.captchaText!;
+      }
+    }
+    return captchaImg;
   }
 
   //functions
   void reloadCaptcha() {
-    captchaLink = null;
+    captchaImg = null;
     captchaController.clear();
     update();
   }
@@ -44,20 +62,28 @@ class LoginController extends GetxController {
     isLoading = true;
     update();
 
-    var res = await _sessionSerivce.login(
+    var loginRes = await _sessionSerivce.login(
         rollno: rollNoController.text,
         password: passController.text,
         captcha: captchaController.text);
     //save login id and pass  and other things in local storage
-    //TODO: How to sync the local stored data with new data
+    //TODO: NEW UPDATE : How to sync the local stored data with new data : using cachehttpManager
 
-    if (res == null &&
-        await _studentProfileSerivce.getStudentProfileData() == null) {
+    if (loginRes == Result.success &&
+        await _studentProfileSerivce.getStudentProfileData() ==
+            Result.success) {
       Get.offNamed(Routes.DASHBOARD);
     } else {
+      if (loginRes == Result.invalidSession) {
+        msg = "Wrong rollno / password";
+        await _sessionSerivce.startSessionService();
+        reloadCaptcha();
+      } else if (loginRes == Result.invalidCaptcha) {
+        msg = "Wrong Captcha";
+      }
+
       isLoading = false;
-      msg = res;
-      // passController.clear();
+      // TODO : testing -> passController.clear();
       update();
     }
   }
