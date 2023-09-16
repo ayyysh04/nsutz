@@ -8,6 +8,8 @@ import 'package:nsutz/controller/splash_controller.dart';
 import 'package:nsutz/controller/studentprofile_controller.dart';
 import 'package:nsutz/controller/subjectwiseattn_controller.dart';
 import 'package:nsutz/services/attendance_service.dart';
+import 'package:nsutz/services/connection_check_service.dart';
+import 'package:nsutz/services/hive_service.dart';
 import 'package:nsutz/services/ml_service.dart';
 import 'package:nsutz/services/nsutapi.dart';
 import 'package:nsutz/services/session_service.dart';
@@ -29,12 +31,14 @@ class InitialBinding extends Bindings {
     // Get.lazyPut(() => AttendanceSerivce(), fenix: false);
 
     //core services
-    Get.put(NsutApi());
-    Get.put(SharedPrefs());
-    Get.put(CaptchaMlService());
-    Get.put(SessionSerivce());
-    Get.put(StudentProfileSerivce());
-    Get.put(AttendanceSerivce());
+    Get.put(NsutApi(), permanent: true);
+    Get.put(HiveService(), permanent: true);
+    Get.put(SharedPrefs(), permanent: true);
+    Get.put(CaptchaMlService(), permanent: true);
+    Get.put(NetworkConnectivityService(), permanent: true);
+    Get.put(SessionSerivce(), permanent: true);
+    Get.put(StudentProfileSerivce(), permanent: true);
+    Get.put(AttendanceSerivce(), permanent: true);
   }
 }
 

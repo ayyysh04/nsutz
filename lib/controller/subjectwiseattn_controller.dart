@@ -83,6 +83,20 @@ class SubjectWiseAttnController extends GetxController {
     }
   }
 
+  String getClassType(String? pracDay, DateTime day) {
+    var dayData = {
+      1: "Mon",
+      2: "Tue",
+      3: "Wed",
+      4: "Thu",
+      5: "Fri",
+    };
+
+    if (pracDay != null && pracDay == dayData[day.weekday]) return 'P';
+
+    return 'T';
+  }
+
   final Map<String, String> attnMarkEquivalent = {
     'NM': 'Attendance Not Marked',
     "CR": "Class Rescheduled",

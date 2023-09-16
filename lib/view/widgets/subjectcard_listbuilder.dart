@@ -22,7 +22,7 @@ class SubjectCardListBuilder extends GetView<DashboardController> {
         var subjectItem = controller.attnData[itemNo];
 
         return GestureDetector(
-          onTap: () => controller.openSubdayWise(
+          onTap: () => controller.openSubDayWise(
               overallPer: subjectItem.overallPercentage!,
               subCode: subjectItem.subjectCode!,
               subName: subjectItem.subjectName!),

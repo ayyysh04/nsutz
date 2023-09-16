@@ -1,46 +1,34 @@
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/routes/routes_const.dart';
+import 'package:nsutz/services/attendance_service.dart';
+import 'package:nsutz/services/connection_check_service.dart';
+import 'package:nsutz/services/hive_service.dart';
 import 'package:nsutz/services/session_service.dart';
 import 'package:nsutz/services/shared_pref.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
 
 class SplashController extends GetxController {
-  // @override
-  // void onInit() {
-  //   FlutterNativeSplash.remove();
-  //   super.onInit();
-  // }
-
   final SharedPrefs _sharedPrefsService = Get.find<SharedPrefs>();
+  final HiveService _hiveService = Get.find<HiveService>();
   final SessionSerivce _sessionSerivce = Get.find<SessionSerivce>();
   final StudentProfileSerivce _studentProfileSerivce =
       Get.find<StudentProfileSerivce>();
-
+  final AttendanceSerivce _attendanceSerivce = Get.find<AttendanceSerivce>();
+  final NetworkConnectivityService _connectivityService =
+      Get.find<NetworkConnectivityService>();
   //check login data and start session service
   Future<void> checkUserDataAndNavigate() async {
+    await _hiveService.init();
     await _sharedPrefsService.init();
-    var check = await _sessionSerivce.startSessionAndCheckLogin();
-
-    if (check ==
-        Result
-            .success) //resumed the login success //TODO:remove isLogin and use rollNo and password as its replacement
+    await _connectivityService.initialise();
+    if (_studentProfileSerivce.loadStudentProfileData()) //load login user data
     {
-      var stuProfileRes = await _studentProfileSerivce.getStudentProfileData();
-      if (stuProfileRes == Result.success) {
-        Get.offNamed(Routes.DASHBOARD);
-      }
-      // else TODO:network error case : show snackbar or something else
-
-    } else if (check == Result.invalidData) {
+      _attendanceSerivce.loadStudentAttendanceData();
+      Get.offNamed(Routes.DASHBOARD);
+    } else //no data , fetch from internet
+    {
+      await _sessionSerivce.startSessionService();
       Get.offNamed(Routes.LOGIN);
-    } else if (check == Result.invalidSession) {
-      //start new session , as prev session is expired now
-      Get.offNamed(Routes.CAPTCHA);
-    } else //TODO:network error ,show snackbar or something else
-    {
-      printError(info: check.toString());
     }
   }
 }

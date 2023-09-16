@@ -85,7 +85,7 @@ class NoticeView extends GetView<NoticeController> {
                   child: GetBuilder<NoticeController>(
                       id: controller.noticeTag,
                       builder: (_) {
-                        return FutureBuilder<String?>(
+                        return FutureBuilder<bool>(
                             future: controller.getNotices(),
                             builder: ((context, snapshot) {
                               if (snapshot.connectionState ==
@@ -94,7 +94,7 @@ class NoticeView extends GetView<NoticeController> {
                                     child: CircularProgressIndicator(
                                   color: kLightgreen,
                                 ));
-                              } else if (snapshot.data != null &&
+                              } else if (snapshot.data! &&
                                   controller.notices.isEmpty) {
                                 return Center(
                                   child: Text(
@@ -106,11 +106,10 @@ class NoticeView extends GetView<NoticeController> {
                                   ),
                                 );
                               } else if (snapshot.hasError ||
-                                  snapshot.data == null) {
+                                  snapshot.data! == false) {
                                 return Center(
                                   child: Text(
-                                    'Error! Press Refresh to load + ${snapshot.data}' //TODO: make this more cleaner
-                                    ,
+                                    'Network Error',
                                     style: TextStyle(
                                       fontSize: 50.sp,
                                       fontFamily: 'Questrial',

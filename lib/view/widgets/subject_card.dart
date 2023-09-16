@@ -28,7 +28,7 @@ class SubjectsCard extends StatelessWidget {
       ),
       elevation: 6.0,
       child: Tooltip(
-        message: '{$subject} Attendance',
+        message: '$subject Attendance',
         child: Container(
           // height: 340.h,
           // margin: EdgeInsets.symmetric(vertical: 10.w),
@@ -101,14 +101,40 @@ class SubjectsCard extends StatelessWidget {
   }
 
   Color getcolor(double percent) {
-    if (percent == 0) return kLightgreen; //no lecture conducted
+    int count = 0;
 
-    if (percent >= 75.0)
-      return kLightgreen;
-    else if (percent >= 55.0)
-      return kLightYellow;
-    else
-      return kLightred;
+    if ((percent > 75)) //to take leave
+    {
+      count = ((presentClasses / 0.75) - overallClasses).floor();
+    } else if ((percent < 75)) //to get 75
+    {
+      count = (((overallClasses * 0.75) - presentClasses) / 0.25).floor();
+    }
+
+    if (count <= 0) {
+      if (percent == 0)
+        return kLightgreen;
+      else
+        return Colors.blue[300]!;
+    } else {
+      if (percent > 75.0) {
+        return kLightgreen;
+      } else if (percent >= 55.0) {
+        return kLightYellow;
+      } else
+        return kLightred;
+    }
+
+    //   if (percent == 0) return kLightgreen; //no lecture conducted
+
+    //   if (percent > 75.0)
+    //     return kLightgreen;
+    //   else if (percent == 75.0)
+    //     return Colors.pink[400]!;
+    //   else if (percent >= 55.0)
+    //     return kLightYellow;
+    //   else
+    //     return kLightred;
   }
 
   String getMsg(double percent, int overallClasses, int presentClasses) {
@@ -122,16 +148,29 @@ class SubjectsCard extends StatelessWidget {
       count = (((overallClasses * 0.75) - presentClasses) / 0.25).floor();
     }
 
-    if (percent == 75) {
-      return "Safe! You cannot take a leave right now";
-    } else if (percent > 75.0) {
-      return "Safe! You can take leave for $count classes";
-    } else if (percent >= 55.0) {
-      return "Unsafe! Attend $count class to enter green zone";
-    } else if (percent > 0) {
-      return "Too low attendance! Attend $count class to enter green zone";
+    if (count <= 0) {
+      if (percent == 0)
+        return "classes not started yet!";
+      else
+        return "Safe! But you cannot take a leave right now";
     } else {
-      return "classes not started yet!";
+      if (percent > 75.0) {
+        return "Safe! You can take leave for $count classes";
+      } else if (percent >= 55.0) {
+        return "Unsafe! Attend $count class to enter green zone";
+      } else
+        return "Too low attendance! Attend $count class to enter green zone";
     }
+    // if (percent == 75) {
+    //   return "Safe! You cannot take a leave right now";
+    // } else if (percent > 75.0) {
+    //   return "Safe! You can take leave for $count classes";
+    // } else if (percent >= 55.0) {
+    //   return "Unsafe! Attend $count class to enter green zone";
+    // } else if (percent > 0) {
+    //   return "Too low attendance! Attend $count class to enter green zone";
+    // } else {
+    //   return "classes not started yet!";
+    // }
   }
 }

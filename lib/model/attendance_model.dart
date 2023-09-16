@@ -1,22 +1,34 @@
-class AttendanceModelSubWise {
-  String? subjectCode;
-  int? overallPresent;
-  int? overallAbsent;
-  int? overallClasses;
-  double? overallPercentage;
-  String? subjectName;
+import 'package:hive/hive.dart';
+part 'attendance_model.g.dart';
 
+@HiveType(typeId: 1)
+class AttendanceModelSubWise extends HiveObject {
+  @HiveField(0)
+  String? subjectCode;
+  @HiveField(1)
+  int? overallPresent;
+  @HiveField(2)
+  int? overallAbsent;
+  @HiveField(3)
+  int? overallClasses;
+  @HiveField(4)
+  double? overallPercentage;
+  @HiveField(5)
+  String? subjectName;
+  @HiveField(6)
   List<Map<DateTime, String>>? details;
+  @HiveField(7)
+  String? pracDay;
   //date:attnMark
-  AttendanceModelSubWise({
-    this.subjectName,
-    this.subjectCode,
-    this.overallPresent,
-    this.overallAbsent,
-    this.overallClasses,
-    this.overallPercentage,
-    this.details,
-  });
+  AttendanceModelSubWise(
+      {this.subjectName,
+      this.subjectCode,
+      this.overallPresent,
+      this.overallAbsent,
+      this.overallClasses,
+      this.overallPercentage,
+      this.details,
+      this.pracDay});
 }
 
 String? getMonthName(String enncodedDate) {

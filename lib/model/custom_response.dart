@@ -1,5 +1,8 @@
+import 'dart:developer';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:nsutz/model/attendance_model.dart';
 
 class CustomResponse<T> //custom response
@@ -61,4 +64,17 @@ class AttendanceDataResponse {
     this.attnData,
     this.semesterNo,
   });
+}
+
+Result errorHandler(Object e) {
+  if (e is SocketException) {
+    log(e.message);
+    return Result.networkError;
+  } else if (e is RangeError) {
+    log(e.message);
+    return Result.internalError;
+  } else {
+    log((e as DioError).message);
+    return Result.internalError;
+  }
 }

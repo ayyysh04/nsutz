@@ -1,11 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 import 'dart:typed_data';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get_utils/get_utils.dart';
+import 'package:get/utils.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:html/parser.dart' as parser;
 import 'package:intl/intl.dart';
 import 'package:nsutz/model/attendance_model.dart';
@@ -13,8 +11,10 @@ import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/model/notice_model.dart';
 import 'package:nsutz/model/student_model.dart';
 
+//TODO:DONT RETURN NETWORK ERROR RESULT ,JUST UPDATE IT IN NETWROK CONNECTION SERVICE
+//TODO:DONT RETURN INTERNAL ERROR ,SHOW A DIALOG BOX THAT A INTERNAL APP ERROR HAS OCCURED
 class NsutApi {
-  var dio = Dio();
+  final _dio = Dio();
   //TODO: find ways to use less selectors and extracts using split based on content of string
   //TODONOTE:no model data will be set here
   //TODO: using interceptor for adding headers -> https://medium.com/flutter-community/dio-interceptors-in-flutter-17be4214f363
@@ -22,9 +22,10 @@ class NsutApi {
     // dio.options.connectTimeout = 10000;
     // dio.options.sendTimeout = 10000;
     // dio.options.receiveTimeout = 10000;
-    dio.options.followRedirects = false;
-    dio.options.baseUrl = "https://imsnsit.org";
-    dio.options.headers = {
+
+    _dio.options.followRedirects = false;
+    _dio.options.baseUrl = "https://imsnsit.org";
+    _dio.options.headers = {
       "Content-Type": "application/x-www-form-urlencoded",
       "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
@@ -34,46 +35,50 @@ class NsutApi {
   }
 
   ///result : success , network error
+  ///
+  ///cookieArg -> set prev session cookie to header
+  ///
+  ///no parameter -> set new session cookie to header
   Future<CustomResponse<String>> setCookieAndHeaders(
       {String?
           cookieArg}) async //retrives phpsesid and set the cookies in header on dio
   {
     //checking cookie header and remove if already
-    if (dio.options.headers
-        .containsKey("Cookie")) //removes previous used cookie if any
-    {
-      dio.options.headers.remove('Cookie');
-    }
-    dio.options.headers.addAll({
+    _dio.options.headers.remove('Cookie');
+    _dio.options.headers.addAll({
       "Referer": "https://imsnsit.org/imsnsit/student.htm",
     });
 
     //adding new cookie
     if (cookieArg != null) //if cookie given : resume session ->return
     {
-      dio.options.headers["Cookie"] = cookieArg;
+      _dio.options.headers["Cookie"] = cookieArg;
       return CustomResponse(data: cookieArg, res: Result.success);
     } else //else get new cookie
     {
       try {
-        await dio.get(
-            "/imsnsit/student_login0.php"); //give response as 302 ,as Dioerror ->go to Dioerror block
+        await _dio.get(
+          "/imsnsit/student_login0.php",
+        ); //give response as 302 ,as Dioerror ->go to Dioerror block
 
-      } on DioError catch (e) {
-        if (e.response != null && e.response!.statusCode == 302) //successfull
-        {
-          var cookie = e.response!.headers.map["set-cookie"]?[0].split(";")[0];
-          if (cookie != null) {
-            debugPrint(e.response!.data!.toString());
-            dio.options.headers["Cookie"] = cookie;
-            return CustomResponse(data: cookie, res: Result.success);
+      } catch (e) {
+        if (e is DioError) {
+          if (e.response != null && e.response!.statusCode == 302) //successfull
+          {
+            var cookie =
+                e.response!.headers.map["set-cookie"]?[0].split(";")[0];
+            if (cookie != null) {
+              printInfo(info: e.response!.data!.toString());
+              _dio.options.headers["Cookie"] = cookie;
+              return CustomResponse(data: cookie, res: Result.success);
+            }
           }
+        } else if (e is SocketException) {
+          return CustomResponse(res: Result.networkError);
         }
       }
     }
-    //if status != 302 or set-cookie property not found or response is null ->return network error
-    debugPrint("Network Error");
-    return CustomResponse(res: Result.networkError);
+    return CustomResponse(res: Result.internalError);
   }
 
   ///result : NetworkError
@@ -81,13 +86,11 @@ class NsutApi {
   ///data : String? hrand | Uint8List? captchaUInt8
   Future<CustomResponse<CaptchaResponse>> getCaptcha() async {
     //adding new header
-    dio.options.headers.addAll({
+    _dio.options.headers.addAll({
       "Referer": "https://www.imsnsit.org/imsnsit/student.htm",
     });
-
     try {
-      var resStr = await dio.get(
-          "/imsnsit/student_login.php"); //return 200 if success ,when error go to DioError
+      var resStr = await _dio.get("/imsnsit/student_login.php");
       var document = parser.parse(resStr.data);
       if (document.getElementById("HRAND_NUM") != null &&
           document.getElementById("captchaimg") != null) {
@@ -112,34 +115,32 @@ class NsutApi {
             data: CaptchaResponse(captchaUInt8: captchaUInt8, hrand: hrand),
             res: Result.success);
       }
-    } on DioError catch (e) {
+    } catch (e) {
+      return CustomResponse(res: errorHandler(e));
       //TODO:Test app without internet and fix this exception accordingly
-      debugPrint("Network Error" + e.response!.statusCode.toString());
+
     }
-    debugPrint("Network Error");
-    return CustomResponse(res: Result.networkError);
+    return CustomResponse(res: Result.internalError);
   }
 
-  Future<CustomResponse<CaptchaResponse>>
-      reloadCaptcha() async //TODO:implement this
-  {
-    dio.options.headers.addAll({
+  ///network error , sucess
+  Future<CustomResponse<CaptchaResponse>> reloadCaptcha() async {
+    _dio.options.headers.addAll({
       "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
-      // "Cookie": cookie
     });
 
     try {
       var resStr =
-          await dio.get("/imsnsit/plum5_fw_utils.php?rty=captcha&typ=login");
+          await _dio.get("/imsnsit/plum5_fw_utils.php?rty=captcha&typ=login");
 
-      var document = parser.parse(resStr.data);
-      // ret["hrand"] = //hrand will be same
-      if (document.getElementById("captchaimg") != null) {
+      var capDoc = parser.parse(resStr.data);
+      //hrand will be same
+      if (capDoc.getElementById("captchaimg") != null) {
         String imgCaptcha = "https://imsnsit.org/imsnsit/" +
-            document.getElementById("captchaimg")!.attributes["src"]!;
+            capDoc.getElementById("captchaimg")!.attributes["src"]!;
 
         //getting captcha image
-        var response = await http.get(Uri.parse(imgCaptcha), headers: {
+        var capRes = await http.get(Uri.parse(imgCaptcha), headers: {
           "Referer": "https://www.imsnsit.org/imsnsit/student.php",
           "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
@@ -147,20 +148,24 @@ class NsutApi {
         });
 
         //storing image as Uint8List
-        Uint8List captchaUInt8 = response.bodyBytes;
-        log(response.bodyBytes.length.toString());
+        Uint8List captchaUInt8 = capRes.bodyBytes;
+        printInfo(info: capRes.bodyBytes.length.toString());
         return CustomResponse(
             res: Result.success,
             data: CaptchaResponse(captchaUInt8: captchaUInt8));
       }
-    } on DioError catch (e) {
-      debugPrint("Network Error" + e.response!.statusCode.toString());
+    } catch (e) {
+      return CustomResponse(res: errorHandler(e));
     }
-    return CustomResponse(res: Result.networkError);
+    return CustomResponse(res: Result.internalError);
   }
 
+  //NOTE:WHEN PASSWORD OR USERNAME ERROR OCCURS WHILE LOGIN ,YOU NEED TO REFRESH THE SESSION
+  //WHEN CAPTCHA ERROR OCCURS ,YOU CAN USE THE SAME SESSION
   ///result : invalidSession ,network error ,success ,invalidCaptcha
-  Future<CustomResponse<ImsUrlResponse>> loginAndCheckCaptcha(
+  ///
+  ///arg : rollno | password | catcha | hrand
+  Future<CustomResponse<String?>> loginUsingCaptcha(
     String rollno,
     String password,
     String captcha,
@@ -178,44 +183,51 @@ class NsutApi {
       "logintype": "student"
     };
 
-    dio.options.headers.addAll({
+    _dio.options.headers.addAll({
       "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
     });
 
     try {
-      await dio.post("/imsnsit/student_login.php",
+      await _dio.post("/imsnsit/student_login.php",
           data: data); //success if status code 302 else error
-    } on DioError catch (e) {
-      if (e.response != null &&
-          e.response!.statusCode == 302 &&
-          e.response!.headers.map["Location"]?[0] != null) {
-        if (e.response!.headers.map["Location"]?[0] ==
-            "student_login.php") //invalid session : wrong pass or username or wrong cookie
-        {
-          return CustomResponse(res: Result.invalidSession);
-        } else if (e.response!.headers.map["Location"]![0] !=
-            "student_login.php?uid=") //login success
-        {
-          String plumUrl = "https://www.imsnsit.org/imsnsit/" +
-              e.response!.headers.map["Location"]![0];
-          return await getStudentImsUrls(plumUrl);
-        } else {
-          //no need to refresh session
-          return CustomResponse(res: Result.invalidCaptcha);
+    } catch (e) {
+      if (e is DioError) {
+        if (e.response != null &&
+            e.response!.statusCode == 302 &&
+            e.response!.headers.map["Location"]?[0] != null) {
+          if (e.response!.headers.map["Location"]?[0] ==
+              "student_login.php") //invalid session : wrong pass or username or wrong cookie
+          {
+            return CustomResponse(res: Result.invalidSession);
+          } else if (e.response!.headers.map["Location"]![0] !=
+                  "student_login.php?uid=" &&
+              e.response!.headers.map["Location"]![0] !=
+                  "plum5_fw_login.php?uid=") //login success
+          {
+            String plumUrl = "https://www.imsnsit.org/imsnsit/" +
+                e.response!.headers.map["Location"]![0];
+            return CustomResponse(res: Result.success, data: plumUrl);
+          } else {
+            return CustomResponse(res: Result.invalidCaptcha);
+          }
         }
+      } else if (e is SocketException) {
+        return CustomResponse(res: Result.networkError);
       }
     }
-    return CustomResponse(res: Result.networkError);
+    return CustomResponse(res: Result.internalError);
   }
 
   ///result : invalid seession ,network error , success
   ///
   ///Data : String? plumUrl | String? dashboard | String? activities | String? registration | String? logout
+  ///
+  ///arg : plumUrl
   Future<CustomResponse<ImsUrlResponse>>
       getStudentImsUrls //get dashboard,activity,regist,logout Url using plumUrl
       (String plumUrl) async {
     try {
-      var res = await dio.get(
+      var res = await _dio.get(
         plumUrl,
       );
       if (res.data.toString().contains("Session") ||
@@ -230,106 +242,131 @@ class NsutApi {
       ret.registration = document[2].children[0].attributes["href"]!;
       ret.logout = document[4].children[0].attributes["href"]!;
       return CustomResponse(res: Result.success, data: ret); //success return
-    } on DioError catch (e) {
-      debugPrint(e.response?.statusCode.toString());
+    } catch (e) {
+      return CustomResponse(res: errorHandler(e));
     }
-    return CustomResponse(res: Result.networkError);
   }
 
   ///result : success , invalidPassword,invalidCaptcha , NetworkError | data if success
+  ///
+  ///arg:dashboardUrl
   Future<CustomResponse<Student>> getStudentProfile(String dashboardUrl) async {
-    dio.options.headers.addAll({
+    _dio.options.headers.addAll({
       "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
     });
     try {
-      var res = await dio.get(dashboardUrl);
+      var res = await _dio.get(dashboardUrl);
       var document = parser.parse(res.data);
       var allElements = document.querySelectorAll("tr.plum_fieldbig");
-      Student studentData = Student.fromMap({
-        "studentImage": CachedNetworkImage(
-          imageUrl: "https://www.imsnsit.org/imsnsit/" +
-              allElements[0].querySelector("img.round")!.attributes["src"]!,
-          httpHeaders: const {
+
+      //downloading student profile as UInt8List
+      var stuProfileRes = await http.get(
+          Uri.parse("https://www.imsnsit.org/imsnsit/" +
+              allElements[0].querySelector("img.round")!.attributes["src"]!),
+          headers: {
             "User-Agent":
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
             "Referer": "https://www.imsnsit.org/imsnsit/student.php",
             "Host": "imsnsit.org",
-          },
-        ),
-        "studentID": allElements[2].children[1].text,
-        "studentName": allElements[3].children[1].text,
-        "studentDOB": allElements[4].children[1].text,
-        "studentGender": allElements[5].children[1].text,
-        "studentCategory": allElements[6].children[1].text,
-        "studentAdmission": allElements[7].children[1].text,
-        "studentBranchName": allElements[8].children[1].text,
-        "studentDegree": allElements[9].children[1].text,
-        "studentFullPart": allElements[10].children[1].text,
-        "studentSpecialization": allElements[11].children[1].text,
-        "studentSection": allElements[12].children[1].text,
-      });
+          });
+
+      Uint8List stuProfileUInt8 = stuProfileRes.bodyBytes;
+      Student studentData = Student.fromStudent(
+        studentImage: stuProfileUInt8,
+        studentID: allElements[2].children[1].text,
+        studentName: allElements[3].children[1].text,
+        studentDOB: allElements[4].children[1].text,
+        studentGender: allElements[5].children[1].text,
+        studentCategory: allElements[6].children[1].text,
+        studentAdmission: allElements[7].children[1].text,
+        studentBranchName: allElements[8].children[1].text,
+        studentDegree: allElements[9].children[1].text,
+        studentFullPart: allElements[10].children[1].text,
+        studentSpecialization: allElements[11].children[1].text,
+        studentSection: allElements[12].children[1].text,
+      );
 
       return CustomResponse(data: studentData, res: Result.success);
-    } on DioError catch (e) {
-      if (e.response!.data
-          .toString()
-          .contains("Invalid Security Number..Please try again")) {
-        return CustomResponse(res: Result.invalidCaptcha);
-      } else if (e.response!.data
-          .toString()
-          .contains("Your password does not match.")) {
-        return CustomResponse(res: Result.invalidPassword);
+    } catch (e) {
+      if (e is DioError) {
+        if (e.response!.data
+            .toString()
+            .contains("Invalid Security Number..Please try again")) {
+          return CustomResponse(res: Result.invalidCaptcha);
+        } else if (e.response!.data
+            .toString()
+            .contains("Your password does not match.")) {
+          return CustomResponse(res: Result.invalidPassword);
+        }
+      } else if (e is SocketException) {
+        return CustomResponse(res: Result.networkError);
       }
     }
-    return CustomResponse(res: Result.networkError);
+    return CustomResponse(res: Result.internalError);
   }
 
   ///Result : invalidSession ,networkError,Success
   ///
   ///Attn data : List<AttendanceModelSubWise>? attnData | int? semesterNo
+  ///
+  ///arg : activityUrl , rollno ,degree,branchName
   Future<CustomResponse<AttendanceDataResponse>> getAttendanceData(
       String activityUrl,
       String rollNo,
       String degree,
       String branchName) async {
-    dio.options.headers.addAll({
+    _dio.options.headers.addAll({
       "Referer": "https://www.imsnsit.org/imsnsit/student_login.php",
     });
     try {
       //activity tab
-      var activity = await dio.get(activityUrl);
+      var activity = await _dio.get(activityUrl);
 
       if (activity.data.toString().contains("Session")) {
         return CustomResponse(res: Result.invalidSession);
 
         //TODO: new update : show password customDialog ,there add button for reLogin
-        // TODO: Navigator.pushReplacement(
-        //     context, MaterialPageRoute(builder: (context) => LoginPage()));
-        // return false;
       }
       var activityDoc = parser.parse(activity.data);
+      //time table
+      // TODO : find practical course and their respective day
+      var pracDay = {};
+      String myTimetableLink = activityDoc
+          .querySelectorAll("li")[8]
+          .querySelector("a")!
+          .attributes["href"]!;
+      var myTimeTable = await _dio.get(myTimetableLink);
+      var myTimeTableDoc = parser.parse(myTimeTable.data);
+      var trRows = myTimeTableDoc.querySelectorAll("tr");
+      // 0 - day
+      for (var i = 2; i < 7; i++) {
+        for (var j = 1; j < trRows[i].children.length; j++) {
+          if (trRows[i].children[j].text.contains('Grp')) {
+            pracDay[trRows[i].children[j].text.split('-Sec:')[0]] =
+                trRows[i].children[0].text;
+          }
+        }
+      }
+      var ttHead = trRows[0].children[0].text.split("Academic Year : ")[1];
+      var ttHeadData = ttHead.split(" / Semester : ");
+      int semesterNo = int.parse(ttHeadData[1]);
+      String year = ttHeadData[0];
+      // int semesterNo = int.parse(acadmicData!.last);
+      // String year = acadmicData[acadmicData.length - 3];
 
-      //testing all TT api
-      // SessionSerivce _sessionService = d.Get.find<SessionSerivce>();
-      // print(activityDoc.querySelectorAll("li")[8].querySelector("a")!.text);
-      // var ttLink = activityDoc
-      // .querySelectorAll("li")[10]
-      // .querySelector("a")!
-      // .attributes["href"];
-      // await getAllTT(_sessionService.sessionData.plumUrl!, ttLink!);
-
+      //semester registration
       String semRegisteredLink = activityDoc
           .querySelectorAll("li")[15]
           .querySelector("a")!
           .attributes["href"]!;
 
-      //sem register
-      var semRegistered = await dio.get(semRegisteredLink);
-      var semRegisteredDoc = parser.parse(semRegistered.data);
-
-      var acadmicData = semRegisteredDoc.body?.text.split("S.No")[0].split(" ");
-      int semesterNo = int.parse(acadmicData!.last);
-      String year = acadmicData[acadmicData.length - 3];
+      //sem register TODO: removed and used tt data to get req data
+      // var semRegistered = await _dio.get(semRegisteredLink);
+      // var semRegisteredDoc = parser.parse(semRegistered.data);
+      // TODO : find practical course and their respective day
+      // var acadmicData = semRegisteredDoc.body?.text.split("S.No")[0].split(" ");
+      // int semesterNo = int.parse(acadmicData!.last);
+      // String year = acadmicData[acadmicData.length - 3];
 
       //attendance request
       String attendanceUrl = activityDoc
@@ -337,11 +374,8 @@ class NsutApi {
           .querySelector("a")!
           .attributes["href"]!;
       var data = {
-        "year": "2021-22" //TODO:FOR TESTING
-        ,
-        // year,
-        "sem": "2", //TODO:FOR TESTING
-        // semesterNo, //semesterNo
+        "year": year,
+        "sem": semesterNo, //semesterNo
         "submit": "Submit",
         "recentitycode": rollNo,
         "degree": degree,
@@ -350,7 +384,7 @@ class NsutApi {
         "ecode": ""
       };
 
-      var attendance = await dio.post(attendanceUrl, data: data);
+      var attendance = await _dio.post(attendanceUrl, data: data);
       if (attendance.data.toString().contains("Session")) {
         return CustomResponse(res: Result.invalidSession);
       }
@@ -404,15 +438,18 @@ class NsutApi {
       for (var i = 1; i < subjectElement.children.length; i++) {
         //assigning to model
 
-        attendanceData.add(AttendanceModelSubWise(
-            details: [],
-            subjectName: subCodeEquvalent[i - 1].split("-")[1],
-            subjectCode: subjectElement.children[i].text,
-            overallPresent: int.parse(overallPresent.children[i].text),
-            overallPercentage:
-                double.parse(overallPercentage.children[i].text.split("%")[0]),
-            overallAbsent: int.parse(overallAbsent.children[i].text),
-            overallClasses: int.parse(overallClasses.children[i].text)));
+        attendanceData.add(
+          AttendanceModelSubWise(
+              details: [],
+              subjectName: subCodeEquvalent[i - 1].split("-")[1],
+              subjectCode: subjectElement.children[i].text,
+              overallPresent: int.parse(overallPresent.children[i].text),
+              overallPercentage: double.parse(
+                  overallPercentage.children[i].text.split("%")[0]),
+              overallAbsent: int.parse(overallAbsent.children[i].text),
+              overallClasses: int.parse(overallClasses.children[i].text),
+              pracDay: pracDay[subjectElement.children[i].text]),
+        );
       }
 
       //TODO:Tp sort the date issue : dec 2021 to jan 2022 ,see my 2020 ims profile attn of sem 1 at 2020-21
@@ -445,79 +482,14 @@ class NsutApi {
           }
         }
       }
-
+      print(pracDay);
       return CustomResponse(
           data: AttendanceDataResponse(
               attnData: attendanceData, semesterNo: semesterNo),
           res: Result.success);
-    } on DioError catch (e) {
-      debugPrint("Error" + e.response!.statusCode.toString());
+    } catch (e) {
+      return CustomResponse(res: errorHandler(e));
     }
-    return CustomResponse(res: Result.networkError);
-  }
-
-  //TODO: make a seprate scrape call to get attendance and store in datewise order : THIS WILL INCRESE LOCAL STORAGE USAGE OF THE APP
-
-  //TODO:UNDERDEVELOPMENT
-  Future<void> getAllTT(String plumUrl, String ttUrl) async {
-    List<List<Subject>> tt = [];
-    // tt.add((await getTimetable(plumUrl, ttUrl, "Mon"))!);
-    // tt.add((await getTimetable(plumUrl, ttUrl, "Tue"))!);
-    // tt.add((await getTimetable(plumUrl, ttUrl, "Wed"))!);
-    // tt.add((await getTimetable(plumUrl, ttUrl, "Thu"))!);
-    // tt.add((await getTimetable(plumUrl, ttUrl, "Fri"))!);
-
-    // print(TT[0][1].teachers.toString());
-  }
-
-  ///result : success,networkError
-  ///
-  ///data : [Subject]
-  Future<CustomResponse<List<Subject>>> getTimetable(
-    String plumUrl,
-    String ttUrl,
-    String day,
-  ) async {
-    var data = {
-      "sem": "2",
-      "sec": "2",
-      "degree": "B.Tech.",
-      "subdepartment": "INFORMATION TECHNOLOGY",
-      "spec": "INFORMATION TECHNOLOGY",
-      "wkd": day,
-      "submit": "Go"
-    };
-    try {
-      dio.options.headers.addAll({
-        "Referer": plumUrl,
-      });
-      List<Subject> subTT = [];
-      Response ttRes = await dio.post(ttUrl, data: data);
-      var activityDoc = parser.parse(ttRes.data);
-      var table = activityDoc
-          .querySelectorAll("table.plum_fieldbig")[1]
-          .getElementsByTagName("tr");
-      for (var tr in table) {
-        late Subject temp = Subject(teachers: []);
-        for (var td in tr.children) {
-          var substr1 = td.text.split(" - ");
-
-          temp = Subject(subCode: substr1[0], teachers: []);
-          var substr2 = substr1[1].split(" / ");
-          // print(substr2.toString());
-          Map<String, String> data = {};
-
-          data.addAll({substr2[0]: substr2[1]});
-          temp.teachers.add(data);
-        }
-        subTT.add(temp);
-        return CustomResponse(res: Result.success, data: subTT);
-      }
-    } on DioError catch (e) {
-      debugPrint(e.message);
-    }
-    //TODO : FIND A WAY TO SEPRATE NETWORK ERROR AND HTTP REQ ERROR -> YOU CAN USE INTERNET CHECK AT START IF APP
-    return CustomResponse(res: Result.networkError);
   }
 
   //NOTICES
@@ -525,12 +497,12 @@ class NsutApi {
   ///data : List [String notice | String? url | DateTime date | String publishedBy]
   Future<CustomResponse<List<NoticeModel>>> getNotices() async {
     try {
-      dio.options.headers.addAll({
+      _dio.options.headers.addAll({
         "Referer": "https://www.imsnsit.org/imsnsit/",
       });
       List<NoticeModel> noticesLink = [];
       Response noticeRes =
-          await dio.get("https://www.imsnsit.org/imsnsit/notifications.php");
+          await _dio.get("https://www.imsnsit.org/imsnsit/notifications.php");
       var activityDoc = parser.parse(noticeRes.data);
       var tableRows = activityDoc.querySelectorAll("tr");
 
@@ -555,15 +527,14 @@ class NsutApi {
       }
       return CustomResponse(data: noticesLink, res: Result.success);
     } on DioError catch (e) {
-      debugPrint(e.message);
+      return CustomResponse(res: errorHandler(e));
     }
-    return CustomResponse(res: Result.networkError);
   }
 
   ///result : success.networkError
   ///data : List [String notice | String? url | DateTime date | String publishedBy]
   Future<CustomResponse<List<NoticeModel>>> getOldNotices() async {
-    dio.options.headers.addAll({
+    _dio.options.headers.addAll({
       "Referer": "https://www.imsnsit.org/imsnsit/",
     });
     List<NoticeModel> noticesLink = [];
@@ -572,7 +543,7 @@ class NsutApi {
       "olddata": "Archive: Click to View Old Notices / Circulars"
     };
     try {
-      Response noticeRes = await dio.post(
+      Response noticeRes = await _dio.post(
           "https://www.imsnsit.org/imsnsit/notifications.php",
           data: data);
       var activityDoc = parser.parse(noticeRes.data);
@@ -603,9 +574,8 @@ class NsutApi {
       }
       return CustomResponse(data: noticesLink, res: Result.success);
     } on DioError catch (e) {
-      debugPrint(e.message);
+      return CustomResponse(res: errorHandler(e));
     }
-    return CustomResponse(res: Result.networkError);
   }
 
   // Future<bool> logout(String plumUrl, String logoutUrl) async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/routes/routes_const.dart';
+import 'package:nsutz/services/connection_check_service.dart';
 import 'package:nsutz/services/session_service.dart';
 import 'package:nsutz/services/studentprofile_service.dart';
 
@@ -13,10 +14,13 @@ class LoginController extends GetxController {
   FocusNode passFocusNode = FocusNode();
   FocusNode captchaNoFocusNode = FocusNode();
   TextEditingController rollNoController =
-      TextEditingController(text: "2020UEI2838");
+      TextEditingController(text: "2021UIT3132"
+          // "2020UEI2838"
+          );
   //TODO:default values for testing
-  TextEditingController passController =
-      TextEditingController(text: "jhjrjn?7"); //TODO:default values for testing
+  TextEditingController passController = TextEditingController(text: "igaeeq!7"
+      // "jhjrjn?7"
+      ); //TODO:default values for testing
   TextEditingController captchaController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -24,10 +28,8 @@ class LoginController extends GetxController {
   final StudentProfileSerivce _studentProfileSerivce =
       Get.find<StudentProfileSerivce>();
   final SessionSerivce _sessionSerivce = Get.find<SessionSerivce>();
-
   Future<Image?> getCaptcha() async {
-    // (await _sessionSerivce.getCaptcha())!["captcha"];
-
+    // await _sessionSerivce.startSessionService();
     if (captchaImg == null) {
       var capRes = await _sessionSerivce.getCaptcha();
 

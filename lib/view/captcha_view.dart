@@ -103,20 +103,6 @@ class CaptchaView extends GetView<CaptchaController> {
                                   return Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      // CachedNetworkImage(
-                                      //   height: 150.h,
-                                      //   width: 320.w,
-                                      //   fit: BoxFit.contain,
-                                      //   imageUrl: snapshot.data!,
-                                      //   httpHeaders: const {
-                                      //     "Referer":
-                                      //         "https://www.imsnsit.org/imsnsit/student.php",
-                                      //     "User-Agent":
-                                      //         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
-                                      //     "Host": "imsnsit.org",
-                                      //   },
-                                      // ),
-
                                       snapshot.data!,
                                       SizedBox(
                                         width: 20.w,

@@ -24,14 +24,17 @@ class SubDayCardListBuilder extends GetView<SubjectWiseAttnController> {
                   verticalOffset: 80.0,
                   child: FadeInAnimation(
                       child: SubDayCard(
-                    tooltipMsg: controller.getTooltipMsg(
-                        controller.subAttnData.details![itemNo].values.first),
-                    ispresent: controller.getIsPresent(
-                        controller.subAttnData.details![itemNo].values.first),
-                    date: controller.subAttnData.details![itemNo].keys.first,
-                    attnMarkWidget: controller.getAttendanceIcon(
-                        controller.subAttnData.details![itemNo].values.first),
-                  ))));
+                          tooltipMsg: controller.getTooltipMsg(controller
+                              .subAttnData.details![itemNo].values.first),
+                          ispresent: controller.getIsPresent(controller
+                              .subAttnData.details![itemNo].values.first),
+                          date: controller
+                              .subAttnData.details![itemNo].keys.first,
+                          attnMarkWidget: controller.getAttendanceIcon(
+                              controller
+                                  .subAttnData.details![itemNo].values.first),
+                          classType: controller.getClassType(
+                              controller.subAttnData.pracDay, controller.subAttnData.details![itemNo].keys.first)))));
         },
       ),
     );
@@ -45,7 +48,9 @@ class SubDayCard extends StatelessWidget {
     required this.ispresent,
     required this.date,
     required this.attnMarkWidget,
+    required this.classType,
   }) : super(key: key);
+  final String classType;
   final String tooltipMsg;
   final bool? ispresent;
   final DateTime date;
@@ -70,7 +75,7 @@ class SubDayCard extends StatelessWidget {
             ),
             //TODO:Divide the list with month name divider
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   toStringDate(date),
@@ -79,7 +84,18 @@ class SubDayCard extends StatelessWidget {
                     fontSize: 50.sp,
                   ),
                 ),
+                Spacer(),
                 attnMarkWidget,
+                SizedBox(
+                  width: 20.w,
+                ),
+                Text(
+                  classType,
+                  style: TextStyle(
+                    fontFamily: 'Questrial',
+                    fontSize: 50.sp,
+                  ),
+                )
               ],
             ),
           ),

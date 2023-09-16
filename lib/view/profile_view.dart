@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import 'package:nsutz/controller/studentprofile_controller.dart';
 import 'package:nsutz/theme/constants.dart';
+import 'package:nsutz/utility/date_function.dart';
 
 class StudentProfileView extends GetView<StudentProfileCotnroller> {
   const StudentProfileView({Key? key}) : super(key: key);
@@ -44,7 +45,8 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(50.w),
-                  child: controller.studentProfileData.studentImage),
+                  child: Image.memory(
+                      controller.studentProfileData.studentImage!)),
               Divider(
                 thickness: 2.0,
                 color: kCardbackgroundcolor,
@@ -63,7 +65,8 @@ class StudentProfileView extends GetView<StudentProfileCotnroller> {
                     ),
                     UserCards(
                       icon: Icons.cake_rounded,
-                      name: controller.studentProfileData.studentDOB.toString(),
+                      name: dobToString(
+                          controller.studentProfileData.studentDOB!),
                       colour: kLightgreen,
                     ),
                     UserCards(

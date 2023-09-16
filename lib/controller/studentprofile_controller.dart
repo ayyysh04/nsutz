@@ -24,8 +24,9 @@ class StudentProfileCotnroller extends GetxController {
   Student get studentProfileData => _studentProfileSerivce.studentData;
 
   Future<void> logout() async {
-    _attendanceSerivce.resetAttenanceData();
-    _studentProfileSerivce.resetProfileData();
+    await _attendanceSerivce.resetAttenanceData();
+    await _studentProfileSerivce.resetProfileData();
     _sessionSerivce.logOut();
+    printInfo(info: "all data cleared! log out");
   }
 }

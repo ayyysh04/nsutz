@@ -21,7 +21,7 @@ class NoticeController extends GetxController {
   String searchTag = 'searchTag';
 
   String noticeTag = 'noticeTag';
-  Future<String> getNotices() async {
+  Future<bool> getNotices() async {
     if (notices.isEmpty) {
       CustomResponse<List<NoticeModel>>? noticeRes;
       if (oldNotice == false) {
@@ -30,11 +30,11 @@ class NoticeController extends GetxController {
         noticeRes = await _nsutApi.getOldNotices();
       }
       if (noticeRes.res != Result.success) {
-        return noticeRes.res.toString();
+        return false;
       }
       notices = noticeRes.data!;
     }
-    return "success";
+    return true;
   }
 
   void refreshNotice() async {
