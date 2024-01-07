@@ -13,11 +13,12 @@ import 'package:nsutz/binding/binding.dart';
 import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/theme/themes.dart';
 
+import 'firebase_options.dart';
 import 'wrappers/crashlytic_wrapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseCrashlyticWrapper.init();
   Hive.registerAdapter(AttendanceModelSubWiseAdapter());
   Hive.registerAdapter(StudentAdapter());
