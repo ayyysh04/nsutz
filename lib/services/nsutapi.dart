@@ -44,9 +44,9 @@ class NsutApi {
   {
     //checking cookie header and remove if already
     _dio.options.headers.remove('Cookie');
-    _dio.options.headers.addAll({
-      "Referer": "https://imsnsit.org/imsnsit/student.htm",
-    });
+    // _dio.options.headers.addAll({
+    //   "Referer": "https://imsnsit.org/imsnsit/student.htm",
+    // });
 
     //adding new cookie
     if (cookieArg != null) //if cookie given : resume session ->return
@@ -56,15 +56,22 @@ class NsutApi {
     } else //else get new cookie
     {
       try {
-        await _dio.get(
-          "/imsnsit/student_login0.php",
-        ); //give response as 302 ,as Dioerror ->go to Dioerror block
+        //open homepage
+        final homePageRes = await _dio.get("/imsnsit/");
+        final cookieToValidate =
+            homePageRes.headers.map["set-cookie"]?[0].split(";")[0];
+        //allow cookie in BE
+        await _dio.get("/imsnsit/student_login110.php",
+            options: Options(headers: {
+              "Referer": "https://imsnsit.org/imsnsit/student.htm",
+              "Cookie": cookieToValidate
+            }));
+        //give response as 302 ,as Dioerror ->go to Dioerror block
       } catch (e) {
         if (e is DioError) {
           if (e.response != null && e.response!.statusCode == 302) //successfull
           {
-            var cookie =
-                e.response!.headers.map["set-cookie"]?[0].split(";")[0];
+            var cookie = e.requestOptions.headers["Cookie"];
             if (cookie != null) {
               printInfo(info: e.response!.data!.toString());
               _dio.options.headers["Cookie"] = cookie;
