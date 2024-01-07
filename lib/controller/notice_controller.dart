@@ -16,23 +16,28 @@ class NoticeController extends GetxController {
   String? searchQuery;
   List<NoticeModel> notices = [];
   List<NoticeModel> searchNotices = [];
+  List<String> categories = ["All"];
   bool oldNotice = false;
-
+  int currCategory = 0;
   String searchTag = 'searchTag';
-
   String noticeTag = 'noticeTag';
+  String categoryTag = 'categoryTag';
+
   Future<bool> getNotices() async {
     if (notices.isEmpty) {
-      CustomResponse<List<NoticeModel>>? noticeRes;
+      CustomResponse<Map<String, dynamic>> noticeRes;
       if (oldNotice == false) {
-        noticeRes = await _nsutApi.getNotices();
+        noticeRes =
+            await _nsutApi.getNotices(category: categories[currCategory]);
       } else {
         noticeRes = await _nsutApi.getOldNotices();
       }
       if (noticeRes.res != Result.success) {
         return false;
       }
-      notices = noticeRes.data!;
+      notices = noticeRes.data!["notices"] as List<NoticeModel>;
+      categories = noticeRes.data!["categories"] as List<String>;
+      update([categoryTag]);
     }
     return true;
   }
@@ -40,6 +45,12 @@ class NoticeController extends GetxController {
   void refreshNotice() async {
     notices = [];
     update([noticeTag]);
+  }
+
+  void updateCategory(int category) {
+    notices = [];
+    currCategory = category;
+    update([noticeTag, categoryTag]);
   }
 
   void getOldNotice() async {

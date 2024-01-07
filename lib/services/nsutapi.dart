@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
@@ -60,7 +59,6 @@ class NsutApi {
         await _dio.get(
           "/imsnsit/student_login0.php",
         ); //give response as 302 ,as Dioerror ->go to Dioerror block
-
       } catch (e) {
         if (e is DioError) {
           if (e.response != null && e.response!.statusCode == 302) //successfull
@@ -118,7 +116,6 @@ class NsutApi {
     } catch (e) {
       return CustomResponse(res: errorHandler(e));
       //TODO:Test app without internet and fix this exception accordingly
-
     }
     return CustomResponse(res: Result.internalError);
   }
@@ -454,6 +451,7 @@ class NsutApi {
 
       //TODO:Tp sort the date issue : dec 2021 to jan 2022 ,see my 2020 ims profile attn of sem 1 at 2020-21
       int todaysDate = getTodaysDecryptedDate();
+      var currYr = DateTime.now().year.toString();
       for (var i = tr.length - 1; i >= 0; i--) {
         if (tr[i].children.length == subjectElement.children.length &&
             getdecryptedDate(tr[i].children[0].text) <=
@@ -473,11 +471,11 @@ class NsutApi {
             {
               attendanceData[i - 1]
                   .details!
-                  .add({toDate(td[0].text, "2022"): 'NM'});
+                  .add({toDate(td[0].text, currYr): 'NM'});
             } else {
               attendanceData[i - 1]
                   .details!
-                  .add({toDate(td[0].text, "2022"): td[i].text});
+                  .add({toDate(td[0].text, currYr): td[i].text});
             }
           }
         }
@@ -495,17 +493,28 @@ class NsutApi {
   //NOTICES
   ///result : success.networkError
   ///data : List [String notice | String? url | DateTime date | String publishedBy]
-  Future<CustomResponse<List<NoticeModel>>> getNotices() async {
+  ///Map of noticeData : List<NoticeModel> , category : List<String>
+  Future<CustomResponse<Map<String, dynamic>>> getNotices(
+      {String category = "ALL"}) async {
     try {
       _dio.options.headers.addAll({
         "Referer": "https://www.imsnsit.org/imsnsit/",
       });
+      var data = {"branch": category, "submit": "Submit"};
       List<NoticeModel> noticesLink = [];
-      Response noticeRes =
-          await _dio.get("https://www.imsnsit.org/imsnsit/notifications.php");
+      List<String> categories = [];
+      Map<String, dynamic> retData = {};
+
+      Response noticeRes = await _dio.post(
+          "https://www.imsnsit.org/imsnsit/notifications.php",
+          data: data);
+      // Response noticeRes = await _dio.get(
+      //   "https://www.imsnsit.org/imsnsit/notifications.php",
+      // );
       var activityDoc = parser.parse(noticeRes.data);
       var tableRows = activityDoc.querySelectorAll("tr");
 
+      //scraping notices
       for (int i = 4; i < tableRows.length; i++) {
         var row = tableRows[i];
         var rowChildren = row.querySelectorAll("td");
@@ -525,7 +534,22 @@ class NsutApi {
           }
         }
       }
-      return CustomResponse(data: noticesLink, res: Result.success);
+      retData['notices'] = noticesLink;
+
+      //scaraping categories
+      var selectElement =
+          activityDoc.querySelector('select.plum_combo[name="branch"]');
+      if (selectElement != null) {
+        var optionElements = selectElement.querySelectorAll('option');
+        for (var option in optionElements) {
+          var optionValue = option.attributes['value'];
+          if (optionValue != null && optionValue.isNotEmpty) {
+            categories.add(optionValue);
+          }
+        }
+      }
+      retData['categories'] = categories;
+      return CustomResponse(data: retData, res: Result.success);
     } on DioError catch (e) {
       return CustomResponse(res: errorHandler(e));
     }
@@ -533,11 +557,14 @@ class NsutApi {
 
   ///result : success.networkError
   ///data : List [String notice | String? url | DateTime date | String publishedBy]
-  Future<CustomResponse<List<NoticeModel>>> getOldNotices() async {
+  ///Map of noticeData : List<NoticeModel> , category : List<String>
+  Future<CustomResponse<Map<String, dynamic>>> getOldNotices() async {
     _dio.options.headers.addAll({
       "Referer": "https://www.imsnsit.org/imsnsit/",
     });
     List<NoticeModel> noticesLink = [];
+    List<String> categories = [];
+    Map<String, dynamic> retData = {};
     var data = {
       "branch": "All",
       "olddata": "Archive: Click to View Old Notices / Circulars"
@@ -549,6 +576,7 @@ class NsutApi {
       var activityDoc = parser.parse(noticeRes.data);
       var tableRows = activityDoc.querySelectorAll("tr");
 
+      //scaraping notices
       for (int i = 4; i < tableRows.length; i++) {
         var row = tableRows[i];
         var rowChildren = row.querySelectorAll("td");
@@ -572,7 +600,22 @@ class NsutApi {
           }
         }
       }
-      return CustomResponse(data: noticesLink, res: Result.success);
+      retData["notices"] = noticesLink;
+
+      //scaraping categories
+      var selectElement =
+          activityDoc.querySelector('select.plum_combo[name="branch"]');
+      if (selectElement != null) {
+        var optionElements = selectElement.querySelectorAll('option');
+        for (var option in optionElements) {
+          var optionValue = option.attributes['value'];
+          if (optionValue != null && optionValue.isNotEmpty) {
+            categories.add(optionValue);
+          }
+        }
+      }
+      retData["categories"] = categories;
+      return CustomResponse(data: retData, res: Result.success);
     } on DioError catch (e) {
       return CustomResponse(res: errorHandler(e));
     }
@@ -602,7 +645,6 @@ class NsutApi {
   // return false;
 
   // }
-
 }
 
 int getdecryptedDate(String enncodedDate) {
@@ -636,7 +678,8 @@ int getdecryptedDate(String enncodedDate) {
   } else if (endcodedMonth == "Jan") {
     month = "01";
   }
-  var date = "2022$month$day";
+  var currYear = DateTime.now().year;
+  var date = "$currYear$month$day";
   return int.parse(date);
 }
 

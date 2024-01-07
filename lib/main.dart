@@ -7,7 +7,7 @@ import 'package:nsutz/model/attendance_model.dart';
 import 'package:nsutz/model/student_model.dart';
 import 'package:nsutz/routes/routes.dart';
 import 'package:nsutz/routes/routes_const.dart';
-import 'package:nsutz/services/binding.dart';
+import 'package:nsutz/binding/binding.dart';
 import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/theme/themes.dart';
 

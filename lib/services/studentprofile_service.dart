@@ -1,6 +1,4 @@
 //Stores profile related data and profile fetching services
-import 'dart:developer';
-
 import 'package:get/get.dart';
 import 'package:nsutz/model/custom_response.dart';
 import 'package:nsutz/model/student_model.dart';

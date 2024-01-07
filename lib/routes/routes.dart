@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nsutz/routes/routes_const.dart';
-import 'package:nsutz/services/binding.dart';
+import 'package:nsutz/binding/binding.dart';
 import 'package:nsutz/view/captcha_view.dart';
 import 'package:nsutz/view/dashboard_view.dart';
 import 'package:nsutz/view/datewiseattn_view.dart';

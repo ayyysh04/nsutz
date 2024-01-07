@@ -79,9 +79,16 @@ class NoticeView extends GetView<NoticeController> {
                             : SizedBox(),
                       );
                     }),
+                GetBuilder<NoticeController>(
+                    id: controller.categoryTag,
+                    builder: (controller) {
+                      return Expanded(
+                          flex: 1, child: categoryListBuilder(controller));
+                    }),
+                SizedBox(height: 25.h),
                 //all notice cards
                 Expanded(
-                  flex: 9,
+                  flex: 15,
                   child: GetBuilder<NoticeController>(
                       id: controller.noticeTag,
                       builder: (_) {
@@ -141,6 +148,44 @@ class NoticeView extends GetView<NoticeController> {
       ),
     );
   }
+}
+
+Widget categoryListBuilder(NoticeController controller) {
+  return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      itemCount: controller.categories.length,
+      separatorBuilder: (context, index) => SizedBox(
+            width: 20.w,
+          ),
+      itemBuilder: (context, index) {
+        final category = controller.categories[index];
+
+        return GestureDetector(
+          onTap: () {
+            controller.updateCategory(index);
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 100.w,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(80.w),
+              color:
+                  controller.currCategory == index ? Colors.blue : Colors.grey,
+            ),
+            child: Center(
+              child: Text(
+                category,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: 'Questrial',
+                    color: Colors.white,
+                    fontSize: 45.sp),
+              ),
+            ),
+          ),
+        );
+      });
 }
 
 class NoticeCardListBuilder extends GetView<NoticeController> {
