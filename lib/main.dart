@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,8 +13,12 @@ import 'package:nsutz/binding/binding.dart';
 import 'package:nsutz/theme/constants.dart';
 import 'package:nsutz/theme/themes.dart';
 
-void main() {
+import 'wrappers/crashlytic_wrapper.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await FirebaseCrashlyticWrapper.init();
   Hive.registerAdapter(AttendanceModelSubWiseAdapter());
   Hive.registerAdapter(StudentAdapter());
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])

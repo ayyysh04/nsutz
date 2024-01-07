@@ -1,0 +1,83 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "verbose dev",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                // "--flavor",
+                // "dev",
+                "-t", // if your have different main file
+                "lib/main.dart",
+                "-v"
+            ]
+        },
+        {
+            "name": "dev", // you can add nickname for it
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                // "--flavor", //flavor name
+                // "dev",
+                "-t", // if your have different main file
+                "lib/main.dart"
+            ],
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "profile-dev", // you can add nickname for it
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                // "--flavor", //flavor name
+                // "dev",
+                "-t", // if your have different main file
+                "lib/main.dart"
+            ],
+            "flutterMode": "profile"
+        },
+        {
+            "name": "release-dev", // you can add nickname for it
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                // "--flavor", //flavor name
+                // "dev",
+                "-t", // if your have different main file
+                "lib/main.dart"
+            ]
+        },
+        {
+            "name": "staging", // you can add nickname for it
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                // "--flavor", //flavor name
+                // "staging",
+                "-t", // if your have different main file
+                "lib/main.dart"
+            ]
+        },
+        {
+            "name": "prod", // you can add nickname for it
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                // "--flavor", //flavor name
+                // "prod",
+                "-t", // if your have different main file
+                "lib/main.dart"
+            ],
+        },
+        {
+            "name": "attach-flutter", // you can add nickname for it
+            "request": "attach",
+            "type": "dart",
+        },
+    ]
+}
