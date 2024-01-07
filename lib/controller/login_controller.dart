@@ -12,13 +12,8 @@ class LoginController extends GetxController {
   FocusNode rollNoFocusNode = FocusNode();
   FocusNode passFocusNode = FocusNode();
   FocusNode captchaNoFocusNode = FocusNode();
-  TextEditingController rollNoController = TextEditingController(
-      // text: "2021UIT3132",
-      );
-  //TODO:default values for testing
-  TextEditingController passController = TextEditingController(
-      // text: "igaeeq!7",
-      ); //TODO:default values for testing
+  TextEditingController rollNoController = TextEditingController();
+  TextEditingController passController = TextEditingController();
   TextEditingController captchaController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
