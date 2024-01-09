@@ -419,6 +419,17 @@ class NsutApi {
 
       //subject codes and name
       List<String> subCodeEquvalent = legends[0].innerHtml.split("<br>");
+      RegExp subReg = RegExp(r"[a-zA-Z0-9]{7}-");
+      List<String> subCodeFinal = [];
+      for (var invSub in subCodeEquvalent) {
+        if (invSub.startsWith(subReg)) {
+          subCodeFinal.add(invSub);
+        } else {
+          print(invSub);
+          subCodeFinal[subCodeFinal.length - 1] =
+              subCodeFinal[subCodeFinal.length - 1] + invSub;
+        }
+      }
       // legends
       //[1].innerHtml.split("<br>");
 
@@ -445,7 +456,7 @@ class NsutApi {
         attendanceData.add(
           AttendanceModelSubWise(
               details: [],
-              subjectName: subCodeEquvalent[i - 1].split("-")[1],
+              subjectName: subCodeFinal[i - 1].split("-")[1],
               subjectCode: subjectElement.children[i].text,
               overallPresent: int.parse(overallPresent.children[i].text),
               overallPercentage: double.parse(
